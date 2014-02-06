@@ -43,7 +43,7 @@ public class CandidateGenerator {
 		BigInteger mask = BigInteger.ONE;
 
 		mask = mask.shiftLeft(this.atts - 1);
-		for (int i = this.atts - 1; i > 0; i--) {
+		for (int i = this.atts - 1; i >= 0; i--) {
 			if (!((value.and(mask).equals(BigInteger.ZERO)))) {
 				if (flag == 2) {
 					bc.Jprev = i; // Last remaining bit set
@@ -63,13 +63,29 @@ public class CandidateGenerator {
 		}
 	}
 	
-	public BigInteger getCurrentCandidate(boolean Testor, boolean Contributes){
+	public void getCurrentCandidate(boolean Testor, boolean Contributes){
+		//System.out.println(this.J);
 		// Last attribute reached
 		if (this.J == this.atts-1){
-			
+			this.remove2MSB(this.Current, this.BC);
+			this.pervIndex = this.BC.Jprev;
+			this.J = this.BC.Jel + 1;			
+			this.Current = this.BC.Candidate.setBit(this.J);
+		} else{
+		// Is testor or doesn't contributes
+		if ((Contributes == false) || (Testor == true)){
+			this.removeMSB(this.Current, this.BC);
+			this.pervIndex = this.BC.Jprev;
+			this.J = this.BC.Jel + 1;
+			this.Current = this.BC.Candidate.setBit(this.J);
 		}
-			
-		return Current;
+		// Not testor but contributes
+		if ((Contributes == true) && (Testor == false)){
+			this.pervIndex = this.J;
+			this.J++;
+			this.Current = this.Current.setBit(this.J);
+		}
+		}
 		
 	}
 }

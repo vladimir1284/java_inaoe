@@ -23,7 +23,7 @@ public class ct_ext_soft {
         
         System.out.println(ifilename);
         
-		Integer rows, atts;
+		int rows, atts;
 		
 		BufferedReader br = new BufferedReader(new FileReader(ifilename));
 		try {
@@ -54,11 +54,38 @@ public class ct_ext_soft {
 		
 		// Sort Basic Matrix
 		BigInteger[] BMsorted = sortBM(BMstr, rows, atts);
+		BasicMatrix bm = new BasicMatrix(BMsorted, rows);
+		CandidateGenerator cg = new CandidateGenerator(BMsorted[0], atts);
+		CandidateEval ce = new CandidateEval();
+		
+		boolean done = false;
+		boolean Contributes;
+		
+		System.out.println("Testors:");
+		// Find Testors
+		while(!done){
+			bm.evaluateCandidate(cg.Current, ce);
+			Contributes = (ce.Nsatisfy > cg.Previous[cg.pervIndex]);
+			cg.Previous[cg.J] = ce.Nsatisfy;
+			//if (ce.Testor){
+			System.out.println(cg.Current);
+			System.out.println(ce.Testor);
+			System.out.println(Contributes);
+			//}
+			cg.getCurrentCandidate(ce.Testor, Contributes);
+		}
+		
+//		BaseCandidate bc = new BaseCandidate();
+//		cg.removeMSB(new BigInteger("101001",2), bc);
+//		System.out.println(bc.Candidate);
+//		System.out.println(bc.Jel);
+//		System.out.println(bc.Jprev);
 		
 		
 		long endTime = System.currentTimeMillis();
 
 	}
+	
 	private static BigInteger[] sortBM(char [][] BMstr, int rows, int atts){
 		int maxOnes = atts;
 		int j, nOnes = 0;
@@ -98,13 +125,6 @@ public class ct_ext_soft {
 		}
 		
 		BigInteger[] BMsort = new BigInteger[rows];
-		CandidateGenerator cg = new CandidateGenerator(BMsort[0], atts);
-		
-//		BaseCandidate bc = new BaseCandidate();
-//		cg.removeMSB(new BigInteger("101001",2), bc);
-//		System.out.println(bc.Candidate);
-//		System.out.println(bc.Jel);
-//		System.out.println(bc.Jprev);
 		
 		// First row
 		char[] Row = new char[atts];
@@ -119,7 +139,7 @@ public class ct_ext_soft {
 		BMsort[0] = new BigInteger(new String(Row),2);
 		//System.out.println(Row);
 		// Others rows
-		int currow = 0, ind = 0;
+		int currow = 0, ind = 1;
 		while (currow < rows){
 			if (currow != minRow){
 				for (int i = 0; i < atts; i++){
