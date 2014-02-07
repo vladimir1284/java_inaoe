@@ -1,13 +1,12 @@
 import java.math.BigInteger;
 
-
 public class CandidateGenerator {
 	BigInteger FirstRow, Current;
 	int[] Previous; // Last count of satisfying rows
 	int J, atts, pervIndex;
 	BaseCandidate BC;
-	
-	public CandidateGenerator(BigInteger firstRow, int atts){
+
+	public CandidateGenerator(BigInteger firstRow, int atts) {
 		this.FirstRow = firstRow;
 		this.Current = BigInteger.ONE;
 		this.Previous = new int[atts];
@@ -22,6 +21,7 @@ public class CandidateGenerator {
 		BigInteger mask = BigInteger.ONE;
 
 		mask = mask.shiftLeft(this.atts - 1);
+		bc.Jprev = -1;
 		for (int i = this.atts - 1; i > 0; i--) {
 			if (!((value.and(mask).equals(BigInteger.ZERO)))) {
 				if (flag == 1) {
@@ -43,6 +43,7 @@ public class CandidateGenerator {
 		BigInteger mask = BigInteger.ONE;
 
 		mask = mask.shiftLeft(this.atts - 1);
+		bc.Jprev = -1;
 		for (int i = this.atts - 1; i >= 0; i--) {
 			if (!((value.and(mask).equals(BigInteger.ZERO)))) {
 				if (flag == 2) {
@@ -62,30 +63,42 @@ public class CandidateGenerator {
 			mask = mask.shiftRight(1);
 		}
 	}
-	
-	public void getCurrentCandidate(boolean Testor, boolean Contributes){
-		//System.out.println(this.J);
+
+	public boolean getCurrentCandidate(boolean Testor, boolean Contributes) {
+		// System.out.println(this.J);
 		// Last attribute reached
-		if (this.J == this.atts-1){
+		if (this.J == this.atts - 1) {
 			this.remove2MSB(this.Current, this.BC);
-			this.pervIndex = this.BC.Jprev;
-			this.J = this.BC.Jel + 1;			
-			this.Current = this.BC.Candidate.setBit(this.J);
-		} else{
-		// Is testor or doesn't contributes
-		if ((Contributes == false) || (Testor == true)){
-			this.removeMSB(this.Current, this.BC);
-			this.pervIndex = this.BC.Jprev;
+			if (this.BC.Jprev != -1) {
+				this.pervIndex = this.BC.Jprev;
+			} else {
+				this.pervIndex = 0;
+				this.Previous[0] = 0;
+			}
 			this.J = this.BC.Jel + 1;
 			this.Current = this.BC.Candidate.setBit(this.J);
+		} else {
+			// Is testor or doesn't contributes
+			if ((Contributes == false) || (Testor == true)) {
+				this.removeMSB(this.Current, this.BC);
+				if (this.BC.Jprev != -1) {
+					this.pervIndex = this.BC.Jprev;
+				} else {
+					this.pervIndex = 0;
+					this.Previous[0] = 0;
+				}
+				// this.pervIndex = this.BC.Jprev;
+				this.J = this.BC.Jel + 1;
+				this.Current = this.BC.Candidate.setBit(this.J);
+			}
+			// Not testor but contributes
+			if ((Contributes == true) && (Testor == false)) {
+				this.pervIndex = this.J;
+				this.J++;
+				this.Current = this.Current.setBit(this.J);
+			}
 		}
-		// Not testor but contributes
-		if ((Contributes == true) && (Testor == false)){
-			this.pervIndex = this.J;
-			this.J++;
-			this.Current = this.Current.setBit(this.J);
-		}
-		}
-		
+		// Check for done
+		return (this.Current.and(this.FirstRow).equals(BigInteger.ZERO));
 	}
 }

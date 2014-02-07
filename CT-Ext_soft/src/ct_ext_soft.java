@@ -72,7 +72,7 @@ public class ct_ext_soft {
 			System.out.println(ce.Testor);
 			System.out.println(Contributes);
 			//}
-			cg.getCurrentCandidate(ce.Testor, Contributes);
+			done = cg.getCurrentCandidate(ce.Testor, Contributes);
 		}
 		
 //		BaseCandidate bc = new BaseCandidate();
