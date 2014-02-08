@@ -22,4 +22,16 @@ public class BasicMatrix {
 		evaluation.Nsatisfy = count;
 		evaluation.Testor = (count == this.rows);
 	}
+	
+	public boolean checkTypical(BigInteger testor) {
+		BigInteger accOR = BigInteger.ZERO;
+		BigInteger anded;
+		for (int i = 0; i < this.rows; i++){
+			anded = this.BM[i].and(testor);
+			if (anded.and(anded.subtract(BigInteger.ONE)).equals(BigInteger.ZERO)){
+				accOR = accOR.or(anded);
+			}
+		}
+		return accOR.equals(testor);
+	}
 }

@@ -3,6 +3,8 @@ import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
 import java.math.BigInteger;
+import java.util.concurrent.BlockingQueue;
+import java.util.concurrent.LinkedBlockingQueue;
 
 public class ct_ext_soft {
 
@@ -55,25 +57,34 @@ public class ct_ext_soft {
 		// Sort Basic Matrix
 		BigInteger[] BMsorted = sortBM(BMstr, rows, atts);
 		BasicMatrix bm = new BasicMatrix(BMsorted, rows);
-		CandidateGenerator cg = new CandidateGenerator(BMsorted[0], atts);
-		CandidateEval ce = new CandidateEval();
 		
-		boolean done = false;
-		boolean Contributes;
+		// create the producer and consumer
+		BlockingQueue<BigInteger> q = new LinkedBlockingQueue<BigInteger>();
+		TestorFinder tf = new TestorFinder(q, BMsorted[0], atts, bm);
+		TypicalCheck tc = new TypicalCheck(q, bm, rows);
 		
-		System.out.println("Testors:");
-		// Find Testors
-		while(!done){
-			bm.evaluateCandidate(cg.Current, ce);
-			Contributes = (ce.Nsatisfy > cg.Previous[cg.pervIndex]);
-			cg.Previous[cg.J] = ce.Nsatisfy;
-			//if (ce.Testor){
-			System.out.println(cg.Current);
-			System.out.println(ce.Testor);
-			System.out.println(Contributes);
-			//}
-			done = cg.getCurrentCandidate(ce.Testor, Contributes);
-		}
+		// run
+		new Thread(tf).start();
+		new Thread(tc).start();
+//		CandidateGenerator cg = new CandidateGenerator(BMsorted[0], atts);
+//		CandidateEval ce = new CandidateEval();
+//		
+//		boolean done = false;
+//		boolean Contributes;
+//		
+//		System.out.println("Testors:");
+//		// Find Testors
+//		while(!done){
+//			bm.evaluateCandidate(cg.Current, ce);
+//			Contributes = (ce.Nsatisfy > cg.Previous[cg.pervIndex]);
+//			cg.Previous[cg.J] = ce.Nsatisfy;
+//			//if (ce.Testor){
+//			System.out.println(cg.Current);
+//			System.out.println(ce.Testor);
+//			System.out.println(Contributes);
+//			//}
+//			done = cg.getCurrentCandidate(ce.Testor, Contributes);
+//		}
 		
 //		BaseCandidate bc = new BaseCandidate();
 //		cg.removeMSB(new BigInteger("101001",2), bc);
