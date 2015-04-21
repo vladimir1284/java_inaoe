@@ -1,34 +1,34 @@
-import java.math.BigInteger;
+package fastCText2;
+
 import java.util.LinkedList;
 import java.util.ListIterator;
 
 public class BasicMatrix {
-	BigInteger[] BM;
+	BMcolumn[] BM;
 	int firstRowOnes, rows;
-	BigInteger[] acceptanceMasks;
+	int [][] acceptanceMasks;
 
-	public BasicMatrix(BigInteger[] BM, int firstRowOnes, int rows,
-			BigInteger[] AcceptanceMasks) {
+	public BasicMatrix(BMcolumn[] BM, int firstRowOnes, int rows,
+			int [][] AcceptanceMasks) {
 		this.BM = BM;
 		this.firstRowOnes = firstRowOnes;
 		this.rows = rows;
 		this.acceptanceMasks = AcceptanceMasks;
 	}
 
-	public BigInteger getAMlx(BigInteger AMl, int x) {
-		return AMl.or(this.BM[x]);
+	public int[] getAMlx(int[] AMl, int x) {
+		return this.BM[x].or(AMl);
 	}
 
-	public BigInteger getCMlx(BigInteger AMl, BigInteger CMl, int x) {
-		return CMl.xor(this.BM[x]).and(CMl)
-				.or(AMl.xor(this.BM[x]).and(this.BM[x]));
+	public int[] getCMlx(int[] AMl, int[] CMl, int x) {
+		return this.BM[x].getCMlx(CMl, AMl);
 	}
 
 	public boolean typical(LinkedList<Integer> testor) {
 		// Get testor's compatibility mask
 		ListIterator<Integer> iterator = testor.listIterator();
-		BigInteger AMl = BigInteger.ZERO;
-		BigInteger CMl = BigInteger.ZERO;
+		int[] AMl = new int [this.BM[0].nwords];
+		int[] CMl = new int [this.BM[0].nwords];
 		int x;
 		while (iterator.hasNext()) {
 			x = iterator.next();
@@ -39,7 +39,7 @@ public class BasicMatrix {
 		// Check that every attribute in testor has a typical row
 		iterator = testor.listIterator();
 		while (iterator.hasNext()) {
-			if (CMl.and(this.BM[iterator.next()]).equals(BigInteger.ZERO)) {
+			if (this.BM[iterator.next()].andEqZ(CMl)) {
 				return false;
 			}
 		}

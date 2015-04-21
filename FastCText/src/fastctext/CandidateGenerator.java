@@ -1,3 +1,4 @@
+package fastCText2;
 import java.math.BigInteger;
 import java.util.LinkedList;
 
