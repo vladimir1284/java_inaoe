@@ -86,13 +86,13 @@ public class TuplaBinaria {
 	// ***************************************************************************
 	// - Devuelve la tupla como un String.
 	// ***************************************************************************
-	public String toString(){
+	public String toString() {
 		String tupla = "";
-		int  i;
-		for (i = 0; i < numBits-1; i++)
+		int i;
+		for (i = 0; i < numBits - 1; i++)
 			tupla += this.getValorEn(i) + " ";
 		tupla += this.getValorEn(i);
-		return tupla;		
+		return tupla;
 	}
 
 	// --------------------------------------------------------------------------
@@ -246,14 +246,28 @@ public class TuplaBinaria {
 	public int sonSubfila(TuplaBinaria operando) {
 		short i;
 		int or_result;
+		boolean thisSUBoper = true;
+		boolean operSUBthis = true;
 		for (i = 0; i < numUnidades; i++) {
 			or_result = unidad[i] | operando.unidad[i];
-			if (operando.unidad[i] == or_result)
-				return 1;
-			if (this.unidad[i] == or_result)
-				return 2;
+			
+			if (operando.unidad[i] != or_result) {
+				thisSUBoper = false; // Ya this no puede ser subfila de operando
+				if (!operSUBthis) {
+					return 0; // Si operando no puede ser subfila de this
+								// terminamos
+				}
+			}
+			if (this.unidad[i] != or_result) {
+				operSUBthis = false; // Ya operando no puede ser subfila de
+										// this
+				if (!thisSUBoper) {
+					return 0; // Si this no puede ser subfila de operando
+								// terminamos
+				}
+			}
 		}
-		return 0;
+		return thisSUBoper ? 1 : 2;
 	}
 
 	// ---------------------------------------------------------------------------

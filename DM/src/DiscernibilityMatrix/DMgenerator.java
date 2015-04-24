@@ -114,7 +114,7 @@ public class DMgenerator {
 		System.out.println("Number of rows in DM: " + DM.size());
 		System.out.println("Number of inconsistencies: " + nulo);
 	}
-
+	// Creating the Discernibility Matrix from the Information System
 	private static long createDM(Instances data, int class_index) {
 		long startTime = System.currentTimeMillis();
 		int i, j, k, current_class = 0;
@@ -161,6 +161,33 @@ public class DMgenerator {
 		}
 		long endTime = System.currentTimeMillis();
 		return endTime - startTime;
+	}
+	
+	// Create Basic Matrix from the Discernibility Matrix
+	private static void createBM(){
+		TuplaBinaria baseRow, currentRow;
+		// Create a local copy from DM to work on
+		LinkedList<TuplaBinaria> LocalDM = new LinkedList<TuplaBinaria>();
+		LocalDM = (LinkedList<TuplaBinaria>) DM.clone();
+		
+		// External Comparison loop
+		while (LocalDM.size() > 1){
+			// Pop the first element as base
+			baseRow = LocalDM.pop();
+			// Compare with the rest of the list
+			currentRow = LocalDM.getFirst();
+			while(currentRow != LocalDM.getLast()){
+				
+				// Usar el metodo sonsubfila del objeto base pasando a current como operando
+				// Esto va a permitir q en el caso en q sean iguales se borre el operando q 
+				// es mas simple q permutar la base x el oprando
+				
+				// Proximo elemento en la lista
+				
+			}
+			// Append the basic row to the Basic Matrix
+			BM.add(baseRow);
+		}
 	}
 
 	// Save the Discernibility Matrix to disk
