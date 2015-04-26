@@ -7,6 +7,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Iterator;
 import java.util.LinkedList;
+import java.util.ListIterator;
 
 import alghoritms.fast_br.tools.TuplaBinaria;
 import weka.core.AttributeStats;
@@ -61,12 +62,12 @@ public class DMgenerator {
 			}
 
 			// Si el usuario pide la DM la salvaremos
-			if (cmdLine.hasOption("dm")) {
+			if (cmdLine.hasOption("mb")) {
 				saveDM = true;
 			}
 			// Si el usuario pide la BM la salvaremos
 			// Si no, se salvará la DM
-			if (cmdLine.hasOption("bm")) {
+			if (cmdLine.hasOption("mb")) {
 				saveBM = true;
 			} else {
 				saveDM = true;
@@ -109,11 +110,20 @@ public class DMgenerator {
 
 		if (saveDM)
 			saveMatrix(filename, "DM", DM);
-		
+
 		System.out.println("Time for DM: " + timeDM + "ms");
 		System.out.println("Number of rows in DM: " + DM.size());
 		System.out.println("Number of inconsistencies: " + nulo);
+
+		if (saveBM) {
+			long timeBM = createBM();
+			saveMatrix(filename, "BM", BM);
+			System.out.println("Time for BM: " + timeBM + "ms");
+			System.out.println("Number of rows in BM: " + BM.size());
+		}
+
 	}
+
 	// Creating the Discernibility Matrix from the Information System
 	private static long createDM(Instances data, int class_index) {
 		long startTime = System.currentTimeMillis();
@@ -162,39 +172,60 @@ public class DMgenerator {
 		long endTime = System.currentTimeMillis();
 		return endTime - startTime;
 	}
-	
+
 	// Create Basic Matrix from the Discernibility Matrix
-	private static void createBM(){
-		TuplaBinaria baseRow, currentRow;
+	@SuppressWarnings("unchecked")
+	private static long createBM() {
+		long startTime = System.currentTimeMillis();
+		TuplaBinaria baseRow, current;
+		ListIterator<TuplaBinaria> itr;
+		int subrow;
+		boolean noBasic;
+
 		// Create a local copy from DM to work on
 		LinkedList<TuplaBinaria> LocalDM = new LinkedList<TuplaBinaria>();
 		LocalDM = (LinkedList<TuplaBinaria>) DM.clone();
-		
+
 		// External Comparison loop
-		while (LocalDM.size() > 1){
+		while (LocalDM.size() > 1) {
 			// Pop the first element as base
 			baseRow = LocalDM.pop();
+			noBasic = false;
 			// Compare with the rest of the list
-			currentRow = LocalDM.getFirst();
-			while(currentRow != LocalDM.getLast()){
-				
-				// Usar el metodo sonsubfila del objeto base pasando a current como operando
-				// Esto va a permitir q en el caso en q sean iguales se borre el operando q 
-				// es mas simple q permutar la base x el oprando
-				
-				// Proximo elemento en la lista
-				
+			itr = (ListIterator<TuplaBinaria>) LocalDM.iterator();
+			while (itr.hasNext()) {
+				current = itr.next();
+				subrow = baseRow.sonSubfila(current);
+				// En caso de q la comparación no de cero
+				switch (subrow) {
+				case 1: // baseRow es subfila de current
+					itr.remove();
+					break;
+				case 2: // current es subfila de baseRow
+					// baseRow = new TuplaBinaria(current);
+					// itr.remove();
+					noBasic = true;
+					break;
+				}
+				if (noBasic)
+					break;
 			}
 			// Append the basic row to the Basic Matrix
-			BM.add(baseRow);
+			if (!noBasic)
+				BM.add(baseRow);
 		}
+		if (LocalDM.size() > 0)
+			BM.add(LocalDM.pop());
+		long endTime = System.currentTimeMillis();
+		return endTime - startTime;
 	}
 
 	// Save the Discernibility Matrix to disk
 	private static void saveMatrix(String filename, String head,
 			LinkedList<TuplaBinaria> M) {
 		Path p = Paths.get(filename);
-		String new_file = head + p.getFileName().toString().split("\\.")[0] + ".txt";
+		String new_file = head + p.getFileName().toString().split("\\.")[0]
+				+ ".txt";
 		try {
 			BufferedWriter out = new BufferedWriter(new FileWriter(new_file));
 			// Write header
