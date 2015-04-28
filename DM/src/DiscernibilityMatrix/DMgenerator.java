@@ -266,7 +266,7 @@ public class DMgenerator {
 		return endTime - startTime;
 	}
 
-	// Save the Discernibility Matrix to disk
+	// Save the Matrix to disk
 	private static void saveMatrix(String filename, String head,
 			LinkedList<TuplaBinaria> M) {
 		Path p = Paths.get(filename);
