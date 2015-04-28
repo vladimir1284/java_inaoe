@@ -258,7 +258,7 @@ public class TuplaBinaria {
 								// terminamos
 				}
 			}
-			if (this.unidad[i] != or_result) {
+			if (unidad[i] != or_result) {
 				operSUBthis = false; // Ya operando no puede ser subfila de
 										// this
 				if (!thisSUBoper) {
