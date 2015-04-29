@@ -58,6 +58,7 @@ public class TuplaBinaria {
 	// **************************************************************************
 	// - Inicializar esta tupla (tupla_this), con la cantidad de elemntos que
 	// contendr� (cardinal), y con un identificador (ID).
+	// TODO inefieciente la creación de las máscaras con cada objeto
 	// **************************************************************************
 	public void set(int cardinal, int ID) {
 		int total, i;

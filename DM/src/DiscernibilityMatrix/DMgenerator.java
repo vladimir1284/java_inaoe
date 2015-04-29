@@ -162,7 +162,7 @@ public class DMgenerator {
 				// Dummy tuple for comparisons results
 				current_tupla = new TuplaBinaria(condition_atts, -1);
 				// Actually compare two records
-				for (k = 0; k < condition_atts - 1; k++) {
+				for (k = 0; k < condition_atts; k++) {
 					current_tupla.setValorEn(k,
 							data.instance(i).value(k) != data.instance(j)
 									.value(k));
@@ -177,7 +177,7 @@ public class DMgenerator {
 
 			}
 			// Last element in the class reached
-			if (i == class_start_index[current_class] - 1)
+			if (i == (class_start_index[current_class+1] - 1))
 				current_class++;
 		}
 		long endTime = System.currentTimeMillis();
