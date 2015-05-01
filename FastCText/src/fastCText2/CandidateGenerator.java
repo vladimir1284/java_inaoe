@@ -9,7 +9,7 @@ public class CandidateGenerator {
 
 	public CandidateGenerator(int firstRowOnes, int atts) {
 		this.firstRowOnes = firstRowOnes;
-		this.Current =  new LinkedList<>();  
+		this.Current =  new LinkedList<Integer>();  
 		this.Current.add(0); // First attribute is the first candidate
 		this.x_1 = -1;
 		this.x = 0;

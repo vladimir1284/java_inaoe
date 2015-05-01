@@ -5,7 +5,6 @@ import java.io.FileReader;
 import java.io.IOException;
 
 import tools.TuplaBinaria;
-import fastCText2.BMcolumn;
 
 public class FastCText3 {
 
@@ -66,7 +65,11 @@ public class FastCText3 {
 		// Sort Basic Matrix
 		BasicMatrix BM = sortBM(BMstrRows, BMstrCols, rows, atts);
 		CandidateGenerator cg = new CandidateGenerator(BM.firstRowOnes, atts);
-		TuplaBinaria[] acceptanceMasks = BM.BM.clone();
+		TuplaBinaria[] acceptanceMasks = new TuplaBinaria[atts];
+		// Creating an empty acceptanceMasks
+		for(int i=0; i < atts; i++){
+			acceptanceMasks[i] = new TuplaBinaria(rows, -1);
+		}
 
 		boolean done = false;
 		boolean contributes, testor;
@@ -77,6 +80,7 @@ public class FastCText3 {
 		while (!done) {
 			testor = false; // We don't know yet
 			if (cg.x_1 == -1) {
+				//System.out.println(cg.Current);
 				AMl = new TuplaBinaria(rows, -1); // Current candidate has only
 													// 1 attribute
 			} else {

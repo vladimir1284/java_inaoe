@@ -26,8 +26,8 @@ public class BasicMatrix {
 	public boolean typical(LinkedList<Integer> testor, TuplaBinaria[] acceptanceMasks) {
 		// Get testor's compatibility mask
 		ListIterator<Integer> iterator = testor.listIterator();
-		TuplaBinaria AMl = new TuplaBinaria();
-		TuplaBinaria CMl = new TuplaBinaria();
+		TuplaBinaria AMl = new TuplaBinaria(rows,-1);
+		TuplaBinaria CMl = new TuplaBinaria(rows,-1);
 		int x;
 		while (iterator.hasNext()) {
 			x = iterator.next();
@@ -37,7 +37,7 @@ public class BasicMatrix {
 		// Check that every attribute in testor has a typical row
 		iterator = testor.listIterator();
 		while (iterator.hasNext()) {
-			if (!this.BM[iterator.next()].andNEqZ(CMl)) {
+			if (BM[iterator.next()].andNEqZ(CMl)) {
 				return false;
 			}
 		}
