@@ -1,5 +1,6 @@
 package fastCText2;
 import java.math.BigInteger;
+import java.util.Iterator;
 import java.util.LinkedList;
 
 public class CandidateGenerator {
@@ -49,4 +50,15 @@ public class CandidateGenerator {
 		// Check for done
 		return (this.Current.getFirst() == this.firstRowOnes); // First attribute has a 0 in the first row
 	}
+	
+	public String toString(){
+		Iterator iter = Current.iterator();
+		String candidate="";
+		while(iter.hasNext()){
+			candidate+="x_"+iter.next();
+		}
+		return candidate;
+		
+	}
+	
 }
