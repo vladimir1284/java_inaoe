@@ -3,6 +3,7 @@ package fastCText2;
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
+import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.ListIterator;
 
@@ -151,5 +152,25 @@ public class BasicMatrix {
 		// }
 		// System.out.print('\n');
 		// }
+	}
+
+	public boolean typical(LinkedList<Integer> testor) {
+		Iterator<Integer> iter = testor.iterator();
+		TuplaBinaria AMl = new TuplaBinaria(rows, -1);
+		TuplaBinaria CMl = new TuplaBinaria(rows, -1);
+		int x;
+		
+		while(iter.hasNext()){
+			x = iter.next();
+			CMl.mascComp(CMl, BM[x], AMl);
+			AMl.mascAcep(AMl, BM[x]);
+		}// Check that every attribute in testor has a typical row
+		iter = testor.listIterator();
+		while (iter.hasNext()) {
+			if (BM[iter.next()].andNEqZ(CMl)) {
+				return false;
+			}
+		}
+		return true;
 	}
 }

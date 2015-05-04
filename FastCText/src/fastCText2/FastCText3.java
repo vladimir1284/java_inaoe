@@ -54,7 +54,8 @@ public class FastCText3 {
 			// AMlx = new BMcolumn(BM.getAMlx(AMl, cg.x), rows);
 			// acceptanceMasks[cg.x] = AMlx.data;
 			contributes = !acceptanceMasks[cg.x].mascAcep(AMl, BM.BM[cg.x]);
-			System.out.println(cg);
+			candidates++;
+			//System.out.println(cg);
 			if (contributes) {
 				if (acceptanceMasks[cg.x].esUnitario()) {
 					//System.out.println("testor");
