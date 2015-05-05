@@ -228,7 +228,20 @@ public class TuplaBinaria {
 		unitario = band2;
 		return band;
 	}
+	
+	// --------------------------------------------------------------------------
+	// **************************************************************************
+	// Update both maks in the same iteration
+	// ma_l+[X] = or(ma_l , X)}
+	// mc_l+[X] = tupla_this = or(and(xor(mc_l , X), mc_l ), and(not(ma_l), X))
+	// **************************************************************************
+	public static void masks(TuplaBinaria MA, TuplaBinaria MC, TuplaBinaria att) {
+		for (int i = 0; i < numUnidades; i++) {
+			MC.unidad[i] = ((MC.unidad[i] & ~att.unidad[i]) | (~MA.unidad[i] & att.unidad[i])); // MC
+			MA.unidad[i] = MA.unidad[i] | att.unidad[i]; // MA
+		}
 
+	}
 	// --------------------------------------------------------------------------
 	// **************************************************************************
 	// - Esta funcion devuelve verdadero si todos los elementos de esta tupla

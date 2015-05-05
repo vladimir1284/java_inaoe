@@ -177,11 +177,9 @@ public class BasicMatrix {
 		
 		while(iter.hasNext()){
 			x = iter.next();
-			CMl.mascComp(CMl, BM[x], AMl);
-			AMl.mascAcep(AMl, BM[x]);
+			TuplaBinaria.masks(AMl, CMl, BM[x]);
 		}// Check that every attribute in testor has a typical row
-		CMl.mascComp(CMl, BM[curr_att], AMl);
-		AMl.mascAcep(AMl, BM[curr_att]);
+		TuplaBinaria.masks(AMl, CMl, BM[curr_att]);
 		iter = testor.listIterator();
 		while (iter.hasNext()) {
 			if (BM[iter.next()].andNEqZ(CMl)) {
