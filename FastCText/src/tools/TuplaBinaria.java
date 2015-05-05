@@ -393,4 +393,9 @@ public class TuplaBinaria {
 		} else
 			unidad[k] = unidad[k] & (~(var << rk));
 	}
+
+	public void clear() {
+		// TODO Auto-generated method stub
+		unitario = false;
+	}
 }
