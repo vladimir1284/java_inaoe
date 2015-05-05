@@ -155,27 +155,27 @@ public class BasicMatrix {
 		// }
 	}
 
-//	public boolean typical(TPila testor) {
-//		// ListIterator<Integer> iterator = base.listIterator();
-//		TuplaBinaria AMl = new TuplaBinaria(rows, -1);
-//		TuplaBinaria CMl = new TuplaBinaria(rows, -1);
-//		int i, x;
-//		for (i = 0; i <= testor.tope; i++) {
-//			x = testor.pila[i];
-//			CMl.mascComp(CMl, BM[x], AMl);
-//			AMl.mascAcep(AMl, BM[x]);
-//		}
-//		// Check that every attribute in testor has a typical row
-//		for (i = 0; i <= testor.tope; i++) {
-//			if (BM[testor.pila[i]].andNEqZ(CMl)) {
+	// public boolean typical(TPila testor) {
+	// // ListIterator<Integer> iterator = base.listIterator();
+	// TuplaBinaria AMl = new TuplaBinaria(rows, -1);
+	// TuplaBinaria CMl = new TuplaBinaria(rows, -1);
+	// int i, x;
+	// for (i = 0; i <= testor.tope; i++) {
+	// x = testor.pila[i];
+	// CMl.mascComp(CMl, BM[x], AMl);
+	// AMl.mascAcep(AMl, BM[x]);
+	// }
+	// // Check that every attribute in testor has a typical row
+	// for (i = 0; i <= testor.tope; i++) {
+	// if (BM[testor.pila[i]].andNEqZ(CMl)) {
 
 	public boolean typical(LinkedList<Integer> testor, Integer curr_att) {
 		Iterator<Integer> iter = testor.iterator();
 		TuplaBinaria AMl = new TuplaBinaria(rows, -1);
 		TuplaBinaria CMl = new TuplaBinaria(rows, -1);
 		int x;
-		
-		while(iter.hasNext()){
+
+		while (iter.hasNext()) {
 			x = iter.next();
 			TuplaBinaria.masks(AMl, CMl, BM[x]);
 		}// Check that every attribute in testor has a typical row
@@ -183,6 +183,26 @@ public class BasicMatrix {
 		iter = testor.listIterator();
 		while (iter.hasNext()) {
 			if (BM[iter.next()].andNEqZ(CMl)) {
+				return false;
+			}
+		}
+		if (BM[curr_att].andNEqZ(CMl)) {
+			return false;
+		}
+		return true;
+	}
+
+	public boolean typical(TPila testor, Integer curr_att) {
+		TuplaBinaria AMl = new TuplaBinaria(rows, -1);
+		TuplaBinaria CMl = new TuplaBinaria(rows, -1);
+
+		for (int i = 0; i <= testor.tope; i++) {
+			TuplaBinaria.masks(AMl, CMl, BM[testor.pila[i]]);
+		}
+		// Check that every attribute in testor has a typical row
+		TuplaBinaria.masks(AMl, CMl, BM[curr_att]);
+		for (int i = 0; i <= testor.tope; i++) {
+			if (BM[testor.pila[i]].andNEqZ(CMl)) {
 				return false;
 			}
 		}
