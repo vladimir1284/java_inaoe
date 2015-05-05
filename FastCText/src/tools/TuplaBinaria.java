@@ -11,18 +11,18 @@ public class TuplaBinaria {
 			2097151, 4194303, 8388607, 16777215, 33554431, 67108863, 134217727,
 			268435455, 536870911, 1073741823, 2147483647, -1 }; // Mask
 
-	private int numBits;
-	private int numUnidades;
-	private int restoBits;
+	static private int numBits;
+	static public int numUnidades;
+	static int restoBits;
 	public int idTupla;
 	private boolean unitario;
 
-	private int mask1;
-	private int mask2;
+	static int mask1;
+	static int mask2;
 
-	private int[] unidad;
+	public int[] unidad;
 
-	final public static int zizeOfUnidad = 32; // Tamaño en java x defecto
+	static final public int zizeOfUnidad = 32; // Tamaño en java x defecto
 
 	// private unsigned int *unidad, mask1, mask2;
 
@@ -39,19 +39,18 @@ public class TuplaBinaria {
 		super();
 		set(cardinal, noFila);
 	}
-
+	
+	public TuplaBinaria(int [] unit){
+		super();
+		unitario = false;
+		unidad = unit;
+	}
+	
 	public TuplaBinaria(TuplaBinaria tupla) {
 		super();
 		int i;
-		numBits = tupla.numBits;
-		numUnidades = tupla.numUnidades;
-		unidad = new int[numUnidades];
-		restoBits = tupla.restoBits;
 		idTupla = tupla.idTupla;
 		unitario = tupla.unitario;
-
-		mask1 = tupla.mask1;
-		mask2 = tupla.mask2;
 
 		unidad = new int[numUnidades];
 		for (i = 0; i < numUnidades; i++)
@@ -64,7 +63,7 @@ public class TuplaBinaria {
 	// contendrá (cardinal), y con un identificador (ID).
 	// **************************************************************************
 	public void set(int cardinal, int ID) {
-		int total, i;
+		int total;
 
 		numBits = cardinal;
 		numUnidades = numBits / zizeOfUnidad;

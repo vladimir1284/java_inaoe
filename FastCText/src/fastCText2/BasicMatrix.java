@@ -3,6 +3,7 @@ package fastCText2;
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
+import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.ListIterator;
 
@@ -154,19 +155,34 @@ public class BasicMatrix {
 		// }
 	}
 
-	public boolean typical(TPila testor) {
-		// ListIterator<Integer> iterator = base.listIterator();
+//	public boolean typical(TPila testor) {
+//		// ListIterator<Integer> iterator = base.listIterator();
+//		TuplaBinaria AMl = new TuplaBinaria(rows, -1);
+//		TuplaBinaria CMl = new TuplaBinaria(rows, -1);
+//		int i, x;
+//		for (i = 0; i <= testor.tope; i++) {
+//			x = testor.pila[i];
+//			CMl.mascComp(CMl, BM[x], AMl);
+//			AMl.mascAcep(AMl, BM[x]);
+//		}
+//		// Check that every attribute in testor has a typical row
+//		for (i = 0; i <= testor.tope; i++) {
+//			if (BM[testor.pila[i]].andNEqZ(CMl)) {
+
+	public boolean typical(LinkedList<Integer> testor) {
+		Iterator<Integer> iter = testor.iterator();
 		TuplaBinaria AMl = new TuplaBinaria(rows, -1);
 		TuplaBinaria CMl = new TuplaBinaria(rows, -1);
-		int i, x;
-		for (i = 0; i <= testor.tope; i++) {
-			x = testor.pila[i];
+		int x;
+		
+		while(iter.hasNext()){
+			x = iter.next();
 			CMl.mascComp(CMl, BM[x], AMl);
 			AMl.mascAcep(AMl, BM[x]);
-		}
-		// Check that every attribute in testor has a typical row
-		for (i = 0; i <= testor.tope; i++) {
-			if (BM[testor.pila[i]].andNEqZ(CMl)) {
+		}// Check that every attribute in testor has a typical row
+		iter = testor.listIterator();
+		while (iter.hasNext()) {
+			if (BM[iter.next()].andNEqZ(CMl)) {
 				return false;
 			}
 		}

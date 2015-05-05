@@ -57,6 +57,7 @@ public class FastCText3 {
 			contributes = !acceptanceMasks[cg.x].mascAcep(AMl, BM.BM[cg.x]);
 			System.out.println(cg);
 			candidates++;
+
 			if (contributes) {
 				if (acceptanceMasks[cg.x].esUnitario()) {
 					// System.out.println("testor");
