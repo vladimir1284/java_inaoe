@@ -53,11 +53,11 @@ public class CandidateGenerator {
 	
 	public String toString(){
 		Iterator iter = Current.iterator();
-		String candidate="";
+		String candidate="$";
 		while(iter.hasNext()){
 			candidate+="x_"+iter.next();
 		}
-		return candidate;
+		return candidate+"$";
 		
 	}
 	

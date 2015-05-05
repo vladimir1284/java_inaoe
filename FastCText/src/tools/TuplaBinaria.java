@@ -75,15 +75,15 @@ public class TuplaBinaria {
 		unidad = new int[numUnidades];
 		// Máscaras para la comparación unitaria
 		mask1 = -1; // 32 bits set in two's complement
-		mask2 = ONES[restoBits-1];
-//		mask1 = mask2 = 0;
-//		mask1 = ~mask1;
-//		for (i = 0; i < restoBits; i++)
-//			mask2 |= 1 << i;
-//
-//		unidad = new int[total];
-//		for (i = 0; i < total; i++)
-//			unidad[i] = 0;
+		mask2 = ONES[restoBits - 1];
+		// mask1 = mask2 = 0;
+		// mask1 = ~mask1;
+		// for (i = 0; i < restoBits; i++)
+		// mask2 |= 1 << i;
+		//
+		// unidad = new int[total];
+		// for (i = 0; i < total; i++)
+		// unidad[i] = 0;
 
 		idTupla = ID;
 	}
@@ -95,6 +95,7 @@ public class TuplaBinaria {
 	// **************************************************************************
 	public TuplaBinaria(String column) {
 		super();
+		unitario = true;
 		numBits = column.length();
 		numUnidades = (numBits + zizeOfUnidad - 1) / zizeOfUnidad;
 		restoBits = numBits % zizeOfUnidad;
@@ -110,15 +111,21 @@ public class TuplaBinaria {
 				// From binary string to integer
 				unidad[i] = parseInt(column.substring(i * zizeOfUnidad, (i + 1)
 						* zizeOfUnidad));
+				if (unitario && unidad[i] != -1) {
+					unitario = false;
+				}
 			}
 			// Remaining bits
 			unidad[numUnidades - 1] = parseInt(column.substring(i
 					* zizeOfUnidad));
 		}
-		
+
 		// Máscaras para la comparación unitaria
 		mask1 = -1; // 32 bits set in two's complement
-		mask2 = ONES[restoBits-1];
+		mask2 = ONES[restoBits - 1];
+		if (unitario && unidad[numUnidades - 1] != mask2) {
+			unitario = false;
+		}
 	}
 
 	// --------------------------------------------------------------------------

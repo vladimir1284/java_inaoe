@@ -6,6 +6,7 @@ import java.io.IOException;
 import java.util.LinkedList;
 import java.util.ListIterator;
 
+import tools.TPila;
 import tools.TuplaBinaria;
 
 public class BasicMatrix {
@@ -16,9 +17,9 @@ public class BasicMatrix {
 																// BM, int
 																// firstRowOnes,
 																// int rows) {
-	// this.BM = BM;
-	// this.firstRowOnes = firstRowOnes;
-	// this.rows = rows;
+		// this.BM = BM;
+		// this.firstRowOnes = firstRowOnes;
+		// this.rows = rows;
 
 		char[][] BMstrRows, BMstrCols;
 		// Read Input file
@@ -53,7 +54,7 @@ public class BasicMatrix {
 		}
 		// Sort BM
 		BM = new TuplaBinaria[atts];
-		sortBM(BMstrRows,BMstrCols);
+		sortBM(BMstrRows, BMstrCols);
 	}
 
 	// public int[] getAMlx(int[] AMl, int x) {
@@ -90,7 +91,7 @@ public class BasicMatrix {
 		int maxOnes = atts;
 		int j, nOnes = 0;
 		int indx, minRow = 0;
-		//TuplaBinaria[] BM = new TuplaBinaria[atts];
+		// TuplaBinaria[] BM = new TuplaBinaria[atts];
 
 		// Find row with minimum ones
 		for (int i = 0; i < rows; i++) {
@@ -151,5 +152,24 @@ public class BasicMatrix {
 		// }
 		// System.out.print('\n');
 		// }
+	}
+
+	public boolean typical(TPila testor) {
+		// ListIterator<Integer> iterator = base.listIterator();
+		TuplaBinaria AMl = new TuplaBinaria(rows, -1);
+		TuplaBinaria CMl = new TuplaBinaria(rows, -1);
+		int i, x;
+		for (i = 0; i <= testor.tope; i++) {
+			x = testor.pila[i];
+			CMl.mascComp(CMl, BM[x], AMl);
+			AMl.mascAcep(AMl, BM[x]);
+		}
+		// Check that every attribute in testor has a typical row
+		for (i = 0; i <= testor.tope; i++) {
+			if (BM[testor.pila[i]].andNEqZ(CMl)) {
+				return false;
+			}
+		}
+		return true;
 	}
 }
