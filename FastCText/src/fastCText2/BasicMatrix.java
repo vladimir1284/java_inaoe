@@ -88,6 +88,25 @@ public class BasicMatrix {
 		return true;
 	}
 
+	public boolean typical(TPila testor, TuplaBinaria[] acceptanceMasks) {
+		// Get testor's compatibility mask
+		TuplaBinaria AMl = new TuplaBinaria(rows, -1);
+		TuplaBinaria CMl = new TuplaBinaria(rows, -1);
+		int x, i;
+		for (i = 0; i <= testor.tope; i++) {
+			x = testor.pila[i];
+			CMl.mascComp(CMl, BM[x], AMl);
+			AMl = acceptanceMasks[x];
+		}
+		// Check that every attribute in testor has a typical row
+		for (i = 0; i <= testor.tope; i++) {
+			if (BM[testor.pila[i]].andNEqZ(CMl)) {
+				return false;
+			}
+		}
+		return true;
+	}
+
 	private void sortBM(char[][] BMstrRows, char[][] BMstrCols) {
 		int maxOnes = atts;
 		int j, nOnes = 0;

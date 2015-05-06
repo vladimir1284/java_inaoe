@@ -28,7 +28,8 @@ public class FastCText3 {
 
 		// Sort Basic Matrix
 		// BasicMatrix BM = sortBM(BMstrRows, BMstrCols, rows, atts);
-		CandidateGenerator cg = new CandidateGenerator(BM.firstRowOnes, BM.atts);
+		//CandidateGenerator cg = new CandidateGenerator(BM.firstRowOnes, BM.atts);
+		FastCandGen cg = new FastCandGen(BM.firstRowOnes, BM.atts);
 		TuplaBinaria[] acceptanceMasks = new TuplaBinaria[BM.atts];
 		// Creating an empty acceptanceMasks
 		for (int i = 0; i < BM.atts; i++) {
@@ -55,7 +56,7 @@ public class FastCText3 {
 			// AMlx = new BMcolumn(BM.getAMlx(AMl, cg.x), rows);
 			// acceptanceMasks[cg.x] = AMlx.data;
 			contributes = !acceptanceMasks[cg.x].mascAcep(AMl, BM.BM[cg.x]);
-			System.out.println(cg);
+			//System.out.println(cg);
 			candidates++;
 
 			if (contributes) {

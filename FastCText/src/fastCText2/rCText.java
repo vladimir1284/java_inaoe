@@ -43,6 +43,7 @@ public class rCText {
 		int j, i = 0;
 		while (i < BM.firstRowOnes) {
 			candidates++;
+			//System.out.println("x"+i);
 			if (BM.BM[i].esUnitario()) {
 				testors++;
 				typicalTestors++;
@@ -80,17 +81,17 @@ public class rCText {
 			LinkedList<Integer> C) {
 		TuplaBinaria cmBx;
 		LinkedList<Integer> contrib = new LinkedList<Integer>();
-		LinkedList<TuplaBinaria> cms = new LinkedList<TuplaBinaria>();
 		Iterator<Integer> iter;
-		int curren_att;
-
+		int curren_att, start;
+		start = cm_last;
 		iter = C.iterator();
 		while (iter.hasNext()) {
 			// cmBx = new TuplaBinaria(BM.rows, -1); // TODO Inefficient
 			cmBx = cm_arr_tup[cm_last+1];
 			curren_att = (int) iter.next();
 			candidates++;
-			System.out.println(curren_att);
+			//print(B,curren_att);
+			//System.out.println(curren_att);
 			if (!cmBx.mascAcep(cmB, BM.BM[curren_att])) {
 				if (cmBx.esUnitario()) {
 					testors++;
@@ -101,23 +102,36 @@ public class rCText {
 					}
 					B.removeLast();
 				} else {
-					contrib.addFirst(curren_att);
+					contrib.add(curren_att);
 					// cms.add(cmBx);
 					cm_last++;// push cm to the queue
 				}
 			}
 		}
-		iter = contrib.descendingIterator();
+		iter = contrib.iterator();
+		int cm_idx = 1;
 		while (iter.hasNext()) {
 			curren_att = (int) iter.next();
 			iter.remove();
 			if (iter.hasNext()) { // There are remaining elements in the tail
 				B.add(curren_att);
 				// eval(B, cms.removeFirst(), contrib);
-				eval(B, cm_arr_tup[cm_last], contrib); 
-				cm_last--;// pop cm
+				eval(B, cm_arr_tup[start+cm_idx], contrib); 
 				B.removeLast();
 			}
+			//cm_last--;// pop cm
+			cm_idx++;
 		}
+		cm_last = start;
+	}
+
+	private static void print(LinkedList<Integer> b, int curren_att) {
+		Iterator<Integer> iter= b.iterator();
+		String cand = "";
+		while(iter.hasNext()){
+			cand+="x"+iter.next();
+		}
+		cand+="x"+curren_att;
+		System.out.println(cand);
 	}
 }
