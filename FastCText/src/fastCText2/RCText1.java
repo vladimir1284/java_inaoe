@@ -1,28 +1,24 @@
 package fastCText2;
 
 import java.io.IOException;
-import java.util.LinkedList;
-import java.util.Iterator;
 
-import tools.RotPtr;
-import tools.SmartPtr;
+import tools.RPila;
 import tools.TPila;
 import tools.TuplaBinaria;
 
-public class rCText {
+public class RCText1 {
 	static int typicalTestors = 0, testors = 0, candidates = 0, cm_last = -1,
-			curren_att, curr_tpl = 0, dummy = 0, level;
+			curren_att, curr_tpl = 0, dummy = 0, level, indx;
 	static BasicMatrix BM;
 	static TPila B = new TPila();
 	static TuplaBinaria[] cm_arr_tup;
-	static SmartPtr cm_indx;
-	static TuplaBinaria cmBx;
+	// static SmartPtr cm_indx;
+	static TuplaBinaria cmBx, curren_CM;
+	static RPila[] MemArr;
 
 	// static Iterator<Integer> iter;
 
 	public static void main(String[] args) throws IOException {
-		LinkedList<Integer> C;		
-		C = new LinkedList<Integer>();
 
 		// check to see if the String array is empty
 		if (args.length != 1) {
@@ -37,20 +33,17 @@ public class rCText {
 		long startTime = System.currentTimeMillis();
 		// ---------------------------------------------------------------------------
 		// ***********************_Main_CT-EXT_execution_*****************************
-		// cumulative masks queue
-		cm_indx = new SmartPtr(BM.atts);
-		// cm_arr_q.setRange(cm_indx.current+1);
-		int[][] cm_array = new int[cm_indx.size][TuplaBinaria.numUnidades];
-		cm_arr_tup = new TuplaBinaria[cm_indx.size];
-		for (int i = 0; i < cm_indx.size; i++) {
-			cm_arr_tup[i] = new TuplaBinaria(cm_array[i]);
+		MemArr = new RPila[BM.atts];
+		for (int i = BM.atts; i > 0; i--) {
+			MemArr[BM.atts-i] = new RPila(i, BM.rows);
 		}
 		B.setRange(BM.atts);
 		// ////////////////////////////////////////////////////////////////////
 		int j, i = 0;
 		while (i < BM.firstRowOnes) {
 			candidates++;
-			//System.out.println("x"+i);
+			//System.out.println("x_"+i);
+			
 			if (BM.BM[i].esUnitario()) {
 				testors++;
 				typicalTestors++;
@@ -60,13 +53,14 @@ public class rCText {
 				B.push(i);
 
 				// init C
-				C.clear();
+				level = 0;
+				MemArr[level].clear();
 				for (j = i + 1; j < BM.atts; j++) {
-					C.add(j);
+					MemArr[level].atts[MemArr[level].current] = j;
+					MemArr[level].push();
 				}
 				// call recursive function
-				level = -1;
-				eval(B, BM.BM[i], C);
+				eval(B, BM.BM[i]);
 			}
 			i++;
 		}
@@ -85,45 +79,43 @@ public class rCText {
 	// ----------------------------------------------------------------------------
 	// ***************************_Recursive_CT-EXT_******************************
 	// ---------------------------------------------------------------------------
-	private static void eval(TPila B, TuplaBinaria cmB,
-			LinkedList<Integer> C) {
-		LinkedList<Integer> contrib = new LinkedList<Integer>();
-		System.out.println(++level);
-		LinkedList<Integer> cms = new LinkedList<Integer>();
-		Iterator<Integer> iter;
-		iter = C.iterator();
-		while (iter.hasNext()) {
-			cmBx = cm_arr_tup[cm_indx.get()];
-			curren_att = (int) iter.next();
+	private static void eval(TPila B, TuplaBinaria cmB) {
+		level++; // Next recursion level
+		for (indx = MemArr[level - 1].head; indx < MemArr[level - 1].current; indx++) {
+			MemArr[level].atts[MemArr[level].current] = MemArr[level - 1].atts[indx]; // Evaluated
+																						// att
+																						// from
+																						// C
+			cmBx = MemArr[level].CMs[MemArr[level].current]; // CM(B+x)
 			candidates++;
+			//System.out.println(B.toString()+"x_"+MemArr[level].atts[MemArr[level].current]);
 
-			if (!cmBx.mascAcep(cmB, BM.BM[curren_att])) {
+			if (!cmBx.mascAcep(cmB,
+					BM.BM[MemArr[level].atts[MemArr[level].current]])) {
 				if (cmBx.esUnitario()) {
 					testors++;
-					if (BM.typical(B,curren_att)) {
+					if (BM.typical(B, MemArr[level].atts[MemArr[level].current])) {
 						typicalTestors++;
 					}
 				} else {
-					contrib.add(curren_att);
-
-					cms.add(cm_indx.get());
-					cm_indx.next();
+					MemArr[level].push();
 				}
 			}
 		}
-		iter = contrib.iterator();
 
-		while (iter.hasNext()) {
-			curren_att = (int) iter.next();
-			iter.remove();
-			if (iter.hasNext()) { // There are remaining elements in the tail
-
+		while(MemArr[level].head != MemArr[level].current){
+			curren_CM = MemArr[level].CMs[MemArr[level].head];
+			curren_att = MemArr[level].popFirst();
+			if (MemArr[level].head != MemArr[level].current) { // There are
+																// remaining
+																// elements in
+																// the tail
 				B.push(curren_att);
-				eval(B, cm_arr_tup[cms.getFirst()], contrib);
+				eval(B, curren_CM);
 				B.pop();
-				System.out.println(--level);
 			}
-			cm_indx.release(cms.removeFirst());
 		}
+		MemArr[level].clear();
+		level--;// Previous recursion level
 	}
 }
