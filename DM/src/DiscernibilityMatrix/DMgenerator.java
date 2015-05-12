@@ -24,6 +24,7 @@ public class DMgenerator {
 	static boolean saveDM = false;
 	static boolean saveBM = false;
 	static boolean nda = false;
+	static boolean miss = false;
 	static long timeDM;
 
 	public static void main(String[] args) throws Exception {
@@ -39,6 +40,7 @@ public class DMgenerator {
 				"Salvar Matriz de Discernibilidad (si no se pide bm, ésta es por defecto)");
 		options.addOption("mb", false, "Salvar Matriz Básica");
 		options.addOption("nda", false, "No usar atributo de desición");
+		options.addOption("miss", false, "Eliminar objetos con falta de información");
 		options.addOption("h", "help", false, "Imprime el mensaje de ayuda");
 
 		try {
@@ -71,6 +73,10 @@ public class DMgenerator {
 			// No se va a tener en cuenta el atributo de decisión
 			if (cmdLine.hasOption("nda")) {
 				nda = true;
+			}
+			// Borrar instancias con missing data
+			if (cmdLine.hasOption("miss")) {
+				miss = true;
 			}
 			// Si el usuario pide la BM la salvaremos
 			// Si no, se salvará la DM
@@ -112,6 +118,9 @@ public class DMgenerator {
 		if (data.classIndex() == -1) {
 			data.setClassIndex(class_index);
 		}
+		// Filter missing data if required
+		if (miss)
+			deleteMissingData(data);
 		// Actually create the Discernibility Matrix
 		if (nda) {
 			timeDM = createDMnda(data);
@@ -177,7 +186,7 @@ public class DMgenerator {
 
 			}
 			// Last element in the class reached
-			if (i == (class_start_index[current_class+1] - 1))
+			if (i == (class_start_index[current_class + 1] - 1))
 				current_class++;
 		}
 		long endTime = System.currentTimeMillis();
@@ -287,5 +296,17 @@ public class DMgenerator {
 		} catch (IOException e) {
 			System.out.println(e);
 		}
+	}
+
+	private static void deleteMissingData(Instances data) {
+		int nInstances = data.numInstances();
+		//System.out.println(nInstances);
+		for (int i = 0; i < nInstances - 1; i++) {
+			if (data.instance(i).hasMissingValue()) {
+				data.delete(i--);
+				nInstances--;
+			}
+		}
+		//System.out.println(data.numInstances());
 	}
 }
