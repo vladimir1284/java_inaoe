@@ -19,8 +19,8 @@ import org.apache.commons.cli.*;
 
 public class DMsimilarity {
 	static String ls = System.lineSeparator();
-	static LinkedList<TuplaBinaria> DM = new LinkedList<TuplaBinaria>();
-	static LinkedList<TuplaBinaria> BM = new LinkedList<TuplaBinaria>();
+	static LinkedList<double[]> DM = new LinkedList<double[]>();
+	static LinkedList<double[]> BM = new LinkedList<double[]>();
 	static int nulo = 0;
 	static boolean saveDM = false;
 	static boolean saveBM = false;
@@ -125,7 +125,7 @@ public class DMsimilarity {
 			deleteMissingData(data);
 		// Actually create the Discernibility Matrix
 		if (nda) {
-			timeDM = createDMnda(data);
+			//timeDM = createDMnda(data);
 		} else {
 			timeDM = createDM(data, class_index);
 		}
@@ -151,11 +151,21 @@ public class DMsimilarity {
 		long startTime = System.currentTimeMillis();
 		int i, j, k, current_class = 0;
 		int condition_atts = data.numAttributes() - 1;
-		float[] current_tupla;
+		double[] current_tupla;
 
 		// Sort by class
 		data.sort(class_index);
 		AttributeStats stats = data.attributeStats(class_index);
+		
+		// Finding range of numerical values
+		double [] range = new double[condition_atts];
+		for (k = 0; k < condition_atts; k++) {
+			if (data.attribute(k).type() == Attribute.NUMERIC){
+				AttributeStats attStats = data.attributeStats(k);
+				range[k] = attStats.numericStats.max - attStats.numericStats.min;
+			}
+				
+		}
 
 		int numClasses = stats.distinctCount; // Number of classes
 		// Starting index for instances in data belonging to class i
@@ -171,7 +181,7 @@ public class DMsimilarity {
 			for (j = class_start_index[current_class + 1]; j < data
 					.numInstances(); j++) {
 				// Dummy tuple for comparisons results
-				current_tupla = new float[condition_atts];
+				current_tupla = new double[condition_atts];
 				// Actually compare two records
 				for (k = 0; k < condition_atts; k++) {
 					// Missing Value implies 1 in the comparison result
@@ -183,6 +193,8 @@ public class DMsimilarity {
 						case Attribute.NUMERIC: {
 							current_tupla[k] = Math.abs(data.instance(i).value(k) - data.instance(j)
 									.value(k))/range[k];
+
+							break;
 						}
 						default: {
 							if (data.instance(i).value(k) != data.instance(j)
@@ -191,7 +203,6 @@ public class DMsimilarity {
 							} else {
 								current_tupla[k] = 0;
 							}
-							break;
 						}
 
 						}
@@ -199,7 +210,7 @@ public class DMsimilarity {
 					}
 				}
 				// Save row if not equal to zero
-				if (!current_tupla.esNulo()) {
+				if (true) {
 					DM.add(current_tupla);
 				} else {
 					nulo++;
@@ -214,53 +225,19 @@ public class DMsimilarity {
 		return endTime - startTime;
 	}
 
-	// Creating the Discernibility Matrix from the Information System (no
-	// decision attribute)
-	private static long createDMnda(Instances data) {
-		long startTime = System.currentTimeMillis();
-		int i, j, k = 0;
-		int condition_atts = data.numAttributes() - 1;
-		int nInstances = data.numInstances();
-		TuplaBinaria current_tupla;
-
-		// Comparing every pair of instances
-		// Stopping before the last class elements
-		for (i = 0; i < nInstances - 1; i++) {
-			for (j = i + 1; j < nInstances; j++) {
-				// Dummy tuple for comparisons results
-				current_tupla = new TuplaBinaria(condition_atts, -1);
-				// Actually compare two records
-				for (k = 0; k < condition_atts; k++) {
-					current_tupla.setValorEn(k,
-							data.instance(i).value(k) != data.instance(j)
-									.value(k));
-
-				}
-				// Save row if not equal to zero
-				if (!current_tupla.esNulo()) {
-					DM.add(current_tupla);
-				} else {
-					nulo++;
-				}
-
-			}
-		}
-		long endTime = System.currentTimeMillis();
-		return endTime - startTime;
-	}
-
 	// Create Basic Matrix from the Discernibility Matrix
 	@SuppressWarnings("unchecked")
 	private static long createBM() {
 		long startTime = System.currentTimeMillis();
-		TuplaBinaria baseRow, current;
-		ListIterator<TuplaBinaria> itr;
+		double[] baseRow;
+		double[] current;
+		ListIterator<double[]> itr;
 		int subrow;
 		boolean noBasic;
 
 		// Create a local copy from DM to work on
-		LinkedList<TuplaBinaria> LocalDM = new LinkedList<TuplaBinaria>();
-		LocalDM = (LinkedList<TuplaBinaria>) DM.clone();
+		LinkedList<double[]> LocalDM = new LinkedList<double[]>();
+		LocalDM = (LinkedList<double[]>) DM.clone();
 
 		// External Comparison loop
 		while (LocalDM.size() > 1) {
@@ -268,10 +245,10 @@ public class DMsimilarity {
 			baseRow = LocalDM.pop();
 			noBasic = false;
 			// Compare with the rest of the list
-			itr = (ListIterator<TuplaBinaria>) LocalDM.iterator();
+			itr = (ListIterator<double[]>) LocalDM.iterator();
 			while (itr.hasNext()) {
 				current = itr.next();
-				subrow = baseRow.sonSubfila(current);
+				subrow = sonSubfila(baseRow,current);
 				// En caso de q la comparación no de cero
 				switch (subrow) {
 				case 1: // baseRow es subfila de current
@@ -279,7 +256,6 @@ public class DMsimilarity {
 					break;
 				case 2: // current es subfila de baseRow
 					// baseRow = new TuplaBinaria(current);
-					// itr.remove();
 					noBasic = true;
 					break;
 				}
@@ -295,10 +271,42 @@ public class DMsimilarity {
 		long endTime = System.currentTimeMillis();
 		return endTime - startTime;
 	}
-
+	// ---------------------------------------------------------------------------
+	// ***************************************************************************
+	// - Evalúa si baseRow es subfila de la tupla current o viceversa.
+	// - Esto es si se mira las tuplas como filas en una MD.
+	// Restorna:
+	// 0 - No son subfila (se quedan las 2)
+	// 1 - baseRow es subfila de current (se queda baseRow)
+	// 2 - operando es subfila de baseRow (se queda current)
+	// ***************************************************************************
+	private static int sonSubfila(double[] baseRow, double[] current) {
+		short i;
+		boolean baseRowSUBcurrent = true;
+		boolean currentSUBbaseRow = true;
+		
+		for (i = 0; i < current.length; i++) {			
+			if (baseRow[i] > current[i]) {
+				baseRowSUBcurrent = false; // Ya baseRow no puede ser subfila de current
+				if (!currentSUBbaseRow) {
+					return 0; // Si current no puede ser subfila de baseRow
+								// terminamos
+				}
+			}
+			if (current[i] > baseRow[i]) {
+				currentSUBbaseRow = false; // Ya current no puede ser subfila de
+										// baseRow
+				if (!baseRowSUBcurrent) {
+					return 0; // Si baseRow no puede ser subfila de current
+								// terminamos
+				}
+			}
+		}
+		return baseRowSUBcurrent ? 1 : 2;
+	}
 	// Save the Matrix to disk
 	private static void saveMatrix(String filename, String head,
-			LinkedList<TuplaBinaria> M) {
+			LinkedList<double[]> M) {
 		Path p = Paths.get(filename);
 		String new_file = head + p.getFileName().toString().split("\\.")[0]
 				+ ".txt";
@@ -306,12 +314,16 @@ public class DMsimilarity {
 			BufferedWriter out = new BufferedWriter(new FileWriter(new_file));
 			// Write header
 			out.write(M.size() + ls);
-			out.write(M.getFirst().numBits + ls);
+			out.write(M.getFirst().length + ls);
 
 			// Write rows
-			Iterator<TuplaBinaria> iterator = M.iterator();
+			Iterator<double[]> iterator = M.iterator();
 			while (iterator.hasNext()) {
-				out.write(iterator.next().toString() + ls);
+				double[] row =iterator.next();
+				for (int k = 0; k < row.length; k++) {
+					out.write(Double.toString(row[k])+' ');
+				}
+				out.write(ls);
 			}
 			out.close();
 		} catch (IOException e) {

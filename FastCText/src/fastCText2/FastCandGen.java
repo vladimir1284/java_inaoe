@@ -54,9 +54,9 @@ public class FastCandGen {
 	public String toString(){
 		String candidate="$";
 		for(int i=0;i<=Current.tope;i++){
-			candidate+="x_"+Current.pila[i];
+			candidate+="c_"+Current.pila[i]+",";
 		}
-		return candidate+"$";
+		return candidate.substring(0, candidate.length()-1)+"$";
 		
 	}
 	
