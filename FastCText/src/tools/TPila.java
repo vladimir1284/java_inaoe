@@ -66,7 +66,7 @@ public class TPila {
 	public String toString() {
 		String list = "";
 		for (int i = 0; i <= tope; i++) {
-			list += "x_" + pila[i];
+			list += pila[i]+" ";
 		}
 		return list;
 	}
