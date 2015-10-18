@@ -4,6 +4,9 @@ import java.io.BufferedWriter;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.util.Iterator;
+import java.util.LinkedList;
 import java.util.Random;
 
 import alghoritms.fast_br.tools.TuplaBinaria;
@@ -136,12 +139,14 @@ public class BMgenerator {
 					break;
 				}
 			}
-			// Terminate if too many trays 
-			if (ntrays > 1e6){
-				System.out.println("We couldn't generate a new row after 1 million trays!!!");
-				System.out.println("Already found: "+ String.valueOf(currentRow)+" basic rows");
+			// Terminate if too many trays
+			if (ntrays > 10e6) {
+				System.out
+						.println("We couldn't generate a new row after 10 million trays!!!");
+				System.out.println("Already found: "
+						+ String.valueOf(currentRow) + " basic rows");
 				return;
-			} else{
+			} else {
 				ntrays++;
 			}
 			// Add a new row and clear ntrays
@@ -152,10 +157,13 @@ public class BMgenerator {
 			}
 		}
 
-		// Print the matrix
-		for (int i = 0; i < rows; i++) {
-			System.out.println(BM[i].toString());
-		}
+		// // Print the matrix
+		// for (int i = 0; i < rows; i++) {
+		// System.out.println(BM[i].toString());
+		// }
+
+		// Save the basic matrix
+		saveMatrix(oFolder, BM, rows, cols, seed, minOnes, maxOnes);
 
 	}
 
@@ -179,4 +187,26 @@ public class BMgenerator {
 		return row;
 	}
 
+	// Save the Matrix to disk BM2000x30_1-9_s492658088
+	private static void saveMatrix(String oFolder, TuplaBinaria[] BM, int rows,
+			int cols, int seed, int minOnes, int maxOnes) {
+		String new_file = oFolder + "/BM" + String.valueOf(rows) + "x"
+				+ String.valueOf(cols) + "_" + String.valueOf(minOnes) + "-"
+				+ String.valueOf(maxOnes) + "_s" + String.valueOf(seed)
+				+ ".txt";
+		try {
+			BufferedWriter out = new BufferedWriter(new FileWriter(new_file));
+			// Write header
+			out.write(rows + "\n");
+			out.write(cols + "\n");
+
+			// Write rows
+			for (int i = 0; i < rows; i++) {
+				out.write(BM[i].toString() + "\n");
+			}
+			out.close();
+		} catch (IOException e) {
+			System.out.println(e);
+		}
+	}
 }
