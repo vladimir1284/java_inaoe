@@ -3,10 +3,6 @@ package DiscernibilityMatrix;
 import java.io.BufferedWriter;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.util.Iterator;
-import java.util.LinkedList;
 import java.util.Random;
 
 import alghoritms.fast_br.tools.TuplaBinaria;
