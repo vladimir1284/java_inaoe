@@ -210,7 +210,14 @@ public class DMsimilarity {
 					}
 				}
 				// Save row if not equal to zero
-				if (true) {
+				boolean emptyRow = true;
+				for (k = 0; k < condition_atts; k++) {
+					if (current_tupla[k] != 0){
+						emptyRow = false;
+						break;
+					}
+				}
+				if (!emptyRow) {
 					DM.add(current_tupla);
 				} else {
 					nulo++;

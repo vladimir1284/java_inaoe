@@ -67,7 +67,7 @@ public class DMgenerator {
 			}
 
 			// Si el usuario pide la DM la salvaremos
-			if (cmdLine.hasOption("mb")) {
+			if (cmdLine.hasOption("md")) {
 				saveDM = true;
 			}
 			// No se va a tener en cuenta el atributo de decisión

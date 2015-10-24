@@ -1,5 +1,6 @@
 package tools;
 
+
 public class RPila {
 	public int[] atts;
 	public TuplaBinaria[] CMs;
