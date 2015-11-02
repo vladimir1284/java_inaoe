@@ -639,7 +639,7 @@ class DialogNumProcessor extends JFrame {
 		        Inicializamos el modo grafico   	  
 		*******************************************************************/
 		// definimos el titulo de la ventana
-		setTitle("Introduzca el número de procesadores.");
+		setTitle("Introduzca el nï¿½mero de procesadores.");
 		// definimos el tam de la ventana como la pantalla completa
 		setSize(320, 50);
 		setLocation(100, 100);

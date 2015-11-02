@@ -50,6 +50,7 @@ public class FAST_CT_EXT implements InterfaceTT {
 
 	private int[] solucion; // - **
 	private int numTestores;
+	private int  comprobaciones;
 	// time_t t_ini, t_fin; // variables para medir el tiempo HHH
 
 	// ---------------------------------------------------------------------
@@ -263,7 +264,8 @@ public class FAST_CT_EXT implements InterfaceTT {
 		// atributos
 
 		rasgo_unitario = 0; // primer rasgo a analizar
-
+		comprobaciones = 0; // Contador de comprobaciones
+		
 		while (mb[PRIMER_FILA][pos_rasgos[rasgo_unitario]] != 0) // Para cada
 		// columna
 		// imprescindible
