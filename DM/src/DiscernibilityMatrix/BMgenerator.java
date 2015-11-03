@@ -44,7 +44,7 @@ public class BMgenerator {
 											// parámetro "help". Ambos son
 											// sinónimos
 				new HelpFormatter().printHelp(
-						DMgenerator.class.getCanonicalName(), options);
+						DMcalculator.class.getCanonicalName(), options);
 				return;
 			}
 			int numatts = 0; // Must have 6 cml arguments
@@ -70,7 +70,7 @@ public class BMgenerator {
 			}
 			if (numatts != 6) {
 				new HelpFormatter().printHelp(
-						DMgenerator.class.getCanonicalName(), options);
+						DMcalculator.class.getCanonicalName(), options);
 				return;
 			} else {
 				// Get values
@@ -82,7 +82,7 @@ public class BMgenerator {
 				oFolder = cmdLine.getOptionValue("o");
 			}
 		} catch (java.lang.NumberFormatException ex) {
-			new HelpFormatter().printHelp(DMgenerator.class.getCanonicalName()
+			new HelpFormatter().printHelp(DMcalculator.class.getCanonicalName()
 					+ " [opciones] <dtabase.arff>", options); // Error,
 																// imprimimos la
 																// ayuda

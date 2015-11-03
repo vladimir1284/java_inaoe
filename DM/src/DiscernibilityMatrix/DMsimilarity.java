@@ -64,7 +64,7 @@ public class DMsimilarity {
 											// parámetro "help". Ambos son
 											// sinónimos
 				new HelpFormatter().printHelp(
-						DMgenerator.class.getCanonicalName(), options);
+						DMcalculator.class.getCanonicalName(), options);
 				return;
 			}
 
@@ -98,12 +98,12 @@ public class DMsimilarity {
 		} catch (org.apache.commons.cli.ParseException ex) {
 			System.out.println(ex.getMessage() + ls);
 
-			new HelpFormatter().printHelp(DMgenerator.class.getCanonicalName()
+			new HelpFormatter().printHelp(DMcalculator.class.getCanonicalName()
 					+ " [opciones] <dtabase.arff>", options); // Error,
 																// imprimimos la
 																// ayuda
 		} catch (java.lang.NumberFormatException ex) {
-			new HelpFormatter().printHelp(DMgenerator.class.getCanonicalName()
+			new HelpFormatter().printHelp(DMcalculator.class.getCanonicalName()
 					+ " [opciones] <dtabase.arff>", options); // Error,
 																// imprimimos la
 																// ayuda

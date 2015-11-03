@@ -16,7 +16,7 @@ import weka.core.converters.ConverterUtils.DataSource;
 
 import org.apache.commons.cli.*;
 
-public class DMgenerator {
+public class DMcalculator {
 	static String ls = System.lineSeparator();
 	static LinkedList<TuplaBinaria> DM = new LinkedList<TuplaBinaria>();
 	static LinkedList<TuplaBinaria> BM = new LinkedList<TuplaBinaria>();
@@ -62,7 +62,7 @@ public class DMgenerator {
 											// parámetro "help". Ambos son
 											// sinónimos
 				new HelpFormatter().printHelp(
-						DMgenerator.class.getCanonicalName(), options);
+						DMcalculator.class.getCanonicalName(), options);
 				return;
 			}
 
@@ -96,12 +96,12 @@ public class DMgenerator {
 		} catch (org.apache.commons.cli.ParseException ex) {
 			System.out.println(ex.getMessage() + ls);
 
-			new HelpFormatter().printHelp(DMgenerator.class.getCanonicalName()
+			new HelpFormatter().printHelp(DMcalculator.class.getCanonicalName()
 					+ " [opciones] <dtabase.arff>", options); // Error,
 																// imprimimos la
 																// ayuda
 		} catch (java.lang.NumberFormatException ex) {
-			new HelpFormatter().printHelp(DMgenerator.class.getCanonicalName()
+			new HelpFormatter().printHelp(DMcalculator.class.getCanonicalName()
 					+ " [opciones] <dtabase.arff>", options); // Error,
 																// imprimimos la
 																// ayuda
@@ -301,7 +301,7 @@ public class DMgenerator {
 	private static void deleteMissingData(Instances data) {
 		int nInstances = data.numInstances();
 		//System.out.println(nInstances);
-		for (int i = 0; i < nInstances - 1; i++) {
+		for (int i = 0; i < nInstances; i++) {
 			if (data.instance(i).hasMissingValue()) {
 				data.delete(i--);
 				nInstances--;
