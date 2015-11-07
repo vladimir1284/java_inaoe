@@ -52,6 +52,7 @@ public class FAST_CT_EXT implements InterfaceTT {
 	private int numTestores;
 	private int  comprobaciones;
 	// time_t t_ini, t_fin; // variables para medir el tiempo HHH
+	public long contadorComprobaciones;
 
 	// ---------------------------------------------------------------------
 	/* estructuras que manejan el TT en formacion (Ahora clases internas) */
