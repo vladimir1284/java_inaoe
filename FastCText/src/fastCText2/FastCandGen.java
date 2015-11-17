@@ -37,7 +37,7 @@ public class FastCandGen {
 			if ((Contributes == false) || (Testor == true)) {
 				//x = Current.pila[Current.tope]+1;
 				x = Current.pop()+1;
-				x_1 = Current.pila[Current.tope];
+				x_1 = Current.tope == -1 ? -1 : Current.pila[Current.tope];
 				Current.push(x);
 			}
 			// Not testor but contributes

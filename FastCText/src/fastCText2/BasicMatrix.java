@@ -27,10 +27,10 @@ public class BasicMatrix {
 		}
 	}
 
-	public BasicMatrix(String ifilename) throws IOException {// TuplaBinaria[]
-																// BM, int
-																// firstRowOnes,
-																// int rows) {
+	public BasicMatrix(String ifilename, boolean reduce) throws IOException {// TuplaBinaria[]
+		// BM, int
+		// firstRowOnes,
+		// int rows) {
 		// this.BM = BM;
 		// this.firstRowOnes = firstRowOnes;
 		// this.rows = rows;
@@ -75,42 +75,42 @@ public class BasicMatrix {
 		}
 		// Rotate to make columns and rows correct
 		rotar(DERECHA);
-		// Reduce columns
-		reduceColumns();
+
+		if (reduce)
+			// Reduce columns
+			reduceColumns();
 
 		// Sort BM
+		ordenInicial();
 
-		// BM = new TuplaBinaria[atts];
-		// sortBM(BMstrRows, BMstrCols);
+		// Debug printing the BM
+		for (int i = 0; i < rows; i++) {
+			for (int j = 0; j < atts; j++) {
+				System.out.print(BM[j].getValorEn(i) + " ");
+			}
+			System.out.print("\n");
+		}
 	}
-
-	// public int[] getAMlx(int[] AMl, int x) {
-	// return this.BM[x].or(AMl);
-	// }
-	//
-	// public int[] getCMlx(int[] AMl, int[] CMl, int x) {
-	// return this.BM[x].getCMlx(CMl, AMl);
-	// }
 
 	private void reduceColumns() {
 		// Eliminate zero row and compress repeated
 		int remainig = atts;
-		int emptyRows = 0, repeatedRows = 0;
+		int emptyCols = 0, repeatedCols = 0;
 		boolean[] toEliminate = new boolean[atts];
 
 		for (int i = 0; i < atts - 1; i++) {
-			if (toEliminate[i] == false) {
+			if (!toEliminate[i]) {
 				// Check for zero column
 				if (BM[i].isEmpty()) {
-					emptyRows++;
+					emptyCols++;
 					toEliminate[i] = true;
 					remainig--;
 				} else {
 					int locRepeated = 1;
 					for (int j = i + 1; j < atts; j++) {
 						// Check for repetitions
-						if (BM[i].equals(BM[j])) {
-							repeatedRows++;
+						if (BM[i].igualA(BM[j])) {
+							repeatedCols++;
 							locRepeated++;
 							toEliminate[j] = true;
 							remainig--;
@@ -123,14 +123,15 @@ public class BasicMatrix {
 				}
 			}
 		}
-		System.out.println("Zero rows: " + Integer.toString(emptyRows));
-		System.out.println("Repeated rows: " + Integer.toString(repeatedRows));
+		System.out.println("Zero columns: " + Integer.toString(emptyCols));
+		System.out.println("Repeated columns: "
+				+ Integer.toString(repeatedCols));
 
 		// New basic matrix
 		TuplaBinaria[] temBM = new TuplaBinaria[remainig];
 		int j = 0;
 		for (int i = 0; i < atts; i++) {
-			if (toEliminate[i]) {
+			if (!toEliminate[i]) {
 				temBM[j++] = BM[i];
 			}
 		}
@@ -325,6 +326,19 @@ public class BasicMatrix {
 
 		rotar(IZQUIERDA);
 		firstRowOnes = nOnes;
+
+		// Poner columnas con unos en 1ra fila a la izquierda
+		TuplaBinaria[] temBM = new TuplaBinaria[atts];
+		int init = 0, end = atts - 1;
+		for (int i = 0; i < atts; i++) {
+			if (BM[i].getValorEn(0) == 1) {
+				temBM[init++] = BM[i];
+			} else {
+				temBM[end--] = BM[i];
+			}
+		}
+		BM = temBM;
+
 	}
 
 	// ---------------------------------------------------------------------------
