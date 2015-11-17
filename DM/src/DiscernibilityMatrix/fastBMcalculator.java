@@ -148,7 +148,7 @@ public class fastBMcalculator {
 			timeDM = createDM(data, class_index);
 		}
 
-		if (saveDM){
+		if (saveDM) {
 			// saveMatrix(filename, "DM", DM, DMsize);
 		}
 		System.out.println("Time for DM: " + timeDM + "ms");
@@ -172,7 +172,7 @@ public class fastBMcalculator {
 		min_hw = condition_atts; // Minimum Hamming Weigh
 		TuplaBinaria current_tupla;
 		// Create arrays
-		int DMmaxsize = data.numInstances()*(data.numInstances()-1)/2;
+		int DMmaxsize = data.numInstances() * (data.numInstances() - 1) / 2;
 		DM = new DMrow[DMmaxsize];
 
 		// Sort by class
@@ -197,7 +197,11 @@ public class fastBMcalculator {
 				// Actually compare two records
 				int hw = 0;
 				for (k = 0; k < condition_atts; k++) {
-					if (data.instance(i).value(k) != data.instance(j).value(k)) {
+					if (data.instance(i).isMissing(k)
+							|| data.instance(j).isMissing(k)) {
+						current_tupla.setValorEn(k, 0);
+					} else if (data.instance(i).value(k) != data.instance(j)
+							.value(k)) {
 						current_tupla.setValorEn(k, 1);
 						hw++;
 					}

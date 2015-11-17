@@ -11,8 +11,21 @@ import tools.TPila;
 import tools.TuplaBinaria;
 
 public class BasicMatrix {
+	private static final int DERECHA = 2;
+	private static final int IZQUIERDA = 1;
 	TuplaBinaria[] BM;
 	int firstRowOnes, rows, atts;
+	LinkedList<RepeatedRow> repeatedList = new LinkedList<RepeatedRow>();
+
+	private class RepeatedRow {
+		public int index;
+		public int count;
+
+		public RepeatedRow(int ind, int count) {
+			index = ind;
+			count = count;
+		}
+	}
 
 	public BasicMatrix(String ifilename) throws IOException {// TuplaBinaria[]
 																// BM, int
@@ -26,15 +39,19 @@ public class BasicMatrix {
 		// Read Input file
 		BufferedReader br = new BufferedReader(new FileReader(ifilename));
 		try {
-			// Size of BM
+			// Size of BM (rows taken as columns!!!!!)
 			String line = br.readLine();
-			rows = Integer.parseInt(line);
-			line = br.readLine();
 			atts = Integer.parseInt(line);
+			line = br.readLine();
+			rows = Integer.parseInt(line);
+
+			BM = new TuplaBinaria[atts];
+			for (int i = 0; i < atts; i++)
+				BM[i] = new TuplaBinaria(rows, i);
 
 			// Dual representation for faster processing
-			BMstrRows = new char[rows][atts]; // Representation by rows
-			BMstrCols = new char[atts][rows]; // Representation by columns
+			// BMstrRows = new char[rows][atts]; // Representation by rows
+			// BMstrCols = new char[atts][rows]; // Representation by columns
 
 			// The rest of the matrix
 			line = br.readLine();
@@ -43,9 +60,12 @@ public class BasicMatrix {
 			while (line != null) {
 				// Parse Row
 				temp = line.trim().replace("\t", " ").split(" ");
-				for (int j = 0; j < atts; j++) {
-					BMstrRows[i][j] = temp[j].charAt(0);
-					BMstrCols[j][i] = temp[j].charAt(0);
+				for (int j = 0; j < rows; j++) {
+					// BMstrRows[i][j] = temp[j].charAt(0);
+					// BMstrCols[j][i] = temp[j].charAt(0);
+					if (temp[j].charAt(0) == '1') {
+						BM[i].setValorEn(j, 1);
+					}
 				}
 				i++;
 				line = br.readLine();
@@ -53,9 +73,15 @@ public class BasicMatrix {
 		} finally {
 			br.close();
 		}
+		// Rotate to make columns and rows correct
+		rotar(DERECHA);
+		// Reduce columns
+		reduceColumns();
+
 		// Sort BM
-		BM = new TuplaBinaria[atts];
-		sortBM(BMstrRows, BMstrCols);
+
+		// BM = new TuplaBinaria[atts];
+		// sortBM(BMstrRows, BMstrCols);
 	}
 
 	// public int[] getAMlx(int[] AMl, int x) {
@@ -65,6 +91,52 @@ public class BasicMatrix {
 	// public int[] getCMlx(int[] AMl, int[] CMl, int x) {
 	// return this.BM[x].getCMlx(CMl, AMl);
 	// }
+
+	private void reduceColumns() {
+		// Eliminate zero row and compress repeated
+		int remainig = atts;
+		int emptyRows = 0, repeatedRows = 0;
+		boolean[] toEliminate = new boolean[atts];
+
+		for (int i = 0; i < atts - 1; i++) {
+			if (toEliminate[i] == false) {
+				// Check for zero column
+				if (BM[i].isEmpty()) {
+					emptyRows++;
+					toEliminate[i] = true;
+					remainig--;
+				} else {
+					int locRepeated = 1;
+					for (int j = i + 1; j < atts; j++) {
+						// Check for repetitions
+						if (BM[i].equals(BM[j])) {
+							repeatedRows++;
+							locRepeated++;
+							toEliminate[j] = true;
+							remainig--;
+						}
+					}
+					if (locRepeated > 1) {
+						repeatedList.add(new RepeatedRow(BM[i].getId(),
+								locRepeated));
+					}
+				}
+			}
+		}
+		System.out.println("Zero rows: " + Integer.toString(emptyRows));
+		System.out.println("Repeated rows: " + Integer.toString(repeatedRows));
+
+		// New basic matrix
+		TuplaBinaria[] temBM = new TuplaBinaria[remainig];
+		int j = 0;
+		for (int i = 0; i < atts; i++) {
+			if (toEliminate[i]) {
+				temBM[j++] = BM[i];
+			}
+		}
+		BM = temBM;
+		atts = remainig;
+	}
 
 	public boolean typical(LinkedList<Integer> testor,
 			TuplaBinaria[] acceptanceMasks) {
@@ -229,5 +301,53 @@ public class BasicMatrix {
 			return false;
 		}
 		return true;
+	}
+
+	// ---------------------------------------------------------------------------
+	public void ordenInicial() {
+		TuplaBinaria temprow;
+
+		rotar(DERECHA);
+
+		// Poner la fila con menor cantidad de unos al inicio
+		int nOnes = rows;
+		int id = 0, count;
+		for (int i = 0; i < atts; i++) {
+			count = BM[i].cantValoresUnitarios();
+			if (count < nOnes) {
+				nOnes = count;
+				id = i;
+			}
+		}
+		temprow = BM[atts - 1];
+		BM[atts - 1] = BM[id];
+		BM[id] = temprow;
+
+		rotar(IZQUIERDA);
+		firstRowOnes = nOnes;
+	}
+
+	// ---------------------------------------------------------------------------
+	private void rotar(int sentido) {
+		int i, j, antNumFilas, antNumColumnas;
+		TuplaBinaria[] tuplaTemp; // / - Se esta trabajando con get valor
+									// - Hay que cambiar por setValorEnPos()
+		// ----------------
+
+		antNumFilas = rows;
+		antNumColumnas = atts;
+		tuplaTemp = new TuplaBinaria[rows];
+		for (i = 0; i < rows; i++) {
+			tuplaTemp[i] = new TuplaBinaria(atts, i);
+			for (j = 0; j < atts; j++) {
+				if (sentido == DERECHA)
+					tuplaTemp[i].setValorEn(j, BM[j].getValorEn(rows - 1 - i));
+				else if (sentido == IZQUIERDA)
+					tuplaTemp[i].setValorEn(j, BM[atts - 1 - j].getValorEn(i));
+			}
+		}
+		BM = tuplaTemp;
+		rows = antNumColumnas; // - Inversion del rango. Cambio.
+		atts = antNumFilas;
 	}
 }

@@ -75,8 +75,8 @@ public class FastCTextMain {
 				.println("time: " + Long.toString(endTime - startTime) + "ms");
 		System.out.println("Typical testors: "
 				+ Integer.toString(ctAlgorithm.getNumSoluciones()));
-		System.out.println("Testors: " + Integer.toString(ctAlgorithm.getNumSoluciones()));
-		System.out.println("Candidates: " + Long.toString(ctAlgorithm.contadorComprobaciones));
+		System.out.println("Testors: " + Integer.toString(ctAlgorithm.testores));
+		System.out.println("Candidates: " + Long.toString(ctAlgorithm.comprobaciones));
 	}
 
 }

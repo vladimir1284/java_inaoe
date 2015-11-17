@@ -50,9 +50,9 @@ public class FAST_CT_EXT implements InterfaceTT {
 
 	private int[] solucion; // - **
 	private int numTestores;
-	private int  comprobaciones;
+	public int testores;
+	public int  comprobaciones;
 	// time_t t_ini, t_fin; // variables para medir el tiempo HHH
-	public long contadorComprobaciones;
 
 	// ---------------------------------------------------------------------
 	/* estructuras que manejan el TT en formacion (Ahora clases internas) */
@@ -255,9 +255,9 @@ public class FAST_CT_EXT implements InterfaceTT {
 		Crea_mb_bits(); // generamos la mb en bits, para calcular la
 						// contribucion
 		// creamos la cabeza de la lista de testores
-		  registerData.getInfo("\n *************************************** ");
-		  registerData.getInfo("\n   ALGORITMO --  FAST CT_EXT ");
-		  registerData.getInfo("\n ***************************************\n");
+//		  registerData.getInfo("\n *************************************** ");
+//		  registerData.getInfo("\n   ALGORITMO --  FAST CT_EXT ");
+//		  registerData.getInfo("\n ***************************************\n");
 
 
 		cabeza = Crea_testor(Crea_arreglo_unsigned(rasgos));
@@ -275,14 +275,17 @@ public class FAST_CT_EXT implements InterfaceTT {
 			ultimo_rasgo = rasgo_siguiente = atrib.atributo;
 			Anexa_atributo(atrib);
 			Calcula_contribucion(atrib); // estos atributos siempre contribuyen
-
+			comprobaciones++;
+			
 			if (band_tt == TE) // verificamos si es TE el rasgo solo
 			{
+				testores++;
 				Guarda_tt(registerData);
 				ultimo_rasgo = Elimina_ultimo_atributo();
 			} else // generamos las combinaciones con los restantes atributos
 			{
 				do {
+					comprobaciones++;
 					// verificamos si puede anexarse otro rasgo a la combinacion
 					if ((rasgo_siguiente = Busca_siguiente(rasgo_siguiente)) > 0) {
 						atrib = Crea_atributo(rasgo_siguiente);
@@ -295,6 +298,7 @@ public class FAST_CT_EXT implements InterfaceTT {
 								ultimo_rasgo = atrib.atributo;
 							else if (band_tt == TE) // es TE
 							{
+								testores++;
 								Guarda_tt(registerData);
 								ultimo_rasgo = Elimina_ultimo_atributo();
 							}
@@ -443,19 +447,19 @@ public class FAST_CT_EXT implements InterfaceTT {
 	public void Guarda_tt(Output registerData) {
 		//int[] lista_testor;
 		//NODO_LISTA t1, t2;
-		NODO_COMBINACION a1;
+		//NODO_COMBINACION a1;
 		
 		if (Es_tt() != 0) // verificamos si es TT la combinacion
 		{
-			solucion[0] = 0;
-			a1 = cabeza_c.siguiente;
-			while (a1 != null) {	
-				solucion[0]++;
-				solucion[solucion[0]] = pos_rasgos[a1.atributo]+1;//a1.atributo+1;
-				a1 = a1.siguiente;				
-			}
+//			solucion[0] = 0;
+//			a1 = cabeza_c.siguiente;
+//			while (a1 != null) {	
+//				solucion[0]++;
+//				solucion[solucion[0]] = pos_rasgos[a1.atributo]+1;//a1.atributo+1;
+//				a1 = a1.siguiente;				
+//			}
 			numTestores++;
-			registerData.resgistTT(solucion);
+			//registerData.resgistTT(solucion);
 			/*lista_testor = new int[longitud_testor + 1];
 			// guardamos la combinacion en la lista de TT
 			Empaqueta_lista(lista_testor);
