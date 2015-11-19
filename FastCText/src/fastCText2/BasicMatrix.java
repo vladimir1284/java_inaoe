@@ -15,15 +15,16 @@ public class BasicMatrix {
 	private static final int IZQUIERDA = 1;
 	TuplaBinaria[] BM;
 	int firstRowOnes, rows, atts;
-	LinkedList<RepeatedRow> repeatedList = new LinkedList<RepeatedRow>();
+	int[] repeatedCount;
+	int[] repeatedAtts;
 
-	private class RepeatedRow {
+	public class RepeatedRow {
 		public int index;
 		public int count;
 
-		public RepeatedRow(int ind, int count) {
+		public RepeatedRow(int ind, int cnt) {
 			index = ind;
-			count = count;
+			count = cnt;
 		}
 	}
 
@@ -48,6 +49,9 @@ public class BasicMatrix {
 			BM = new TuplaBinaria[atts];
 			for (int i = 0; i < atts; i++)
 				BM[i] = new TuplaBinaria(rows, i);
+
+			repeatedCount = new int[rows];
+			repeatedAtts = new int[rows];
 
 			// Dual representation for faster processing
 			// BMstrRows = new char[rows][atts]; // Representation by rows
@@ -84,12 +88,12 @@ public class BasicMatrix {
 		ordenInicial();
 
 		// Debug printing the BM
-		for (int i = 0; i < rows; i++) {
-			for (int j = 0; j < atts; j++) {
-				System.out.print(BM[j].getValorEn(i) + " ");
-			}
-			System.out.print("\n");
-		}
+		// for (int i = 0; i < rows; i++) {
+		// for (int j = 0; j < atts; j++) {
+		// System.out.print(BM[j].getValorEn(i) + " ");
+		// }
+		// System.out.print("\n");
+		// }
 	}
 
 	private void reduceColumns() {
@@ -117,8 +121,7 @@ public class BasicMatrix {
 						}
 					}
 					if (locRepeated > 1) {
-						repeatedList.add(new RepeatedRow(BM[i].getId(),
-								locRepeated));
+						repeatedCount[BM[i].getId()] = locRepeated;
 					}
 				}
 			}
@@ -129,14 +132,20 @@ public class BasicMatrix {
 
 		// New basic matrix
 		TuplaBinaria[] temBM = new TuplaBinaria[remainig];
-		int j = 0;
+		int j = 0, k = 0;
 		for (int i = 0; i < atts; i++) {
 			if (!toEliminate[i]) {
 				temBM[j++] = BM[i];
 			}
+			if (repeatedCount[i] != 0) {
+				repeatedAtts[k++] = i;
+			}
 		}
 		BM = temBM;
 		atts = remainig;
+		// for (int i = 0; i < atts; i++) {
+		// System.out.println(BM[i].getId());
+		// }
 	}
 
 	public boolean typical(LinkedList<Integer> testor,
