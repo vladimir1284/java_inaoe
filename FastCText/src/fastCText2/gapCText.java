@@ -81,8 +81,9 @@ public class gapCText {
 							// Find the attribute in the current candidate
 							// Using binary search
 							for (int i = 0; i <= cg.Current.tope; i++) {
-								if (id == BM.BM[cg.Current.pila[i]].getId())
+								if (id == BM.BM[cg.Current.pila[i]].getId()) {
 									count *= BM.repeatedCount[id];
+								}
 							}
 						}
 						// System.out.print(" R");
@@ -104,21 +105,21 @@ public class gapCText {
 		System.out.println("Candidates: " + Integer.toString(candidates));
 	}
 
-//	// Binary search
-//	private static boolean hasElement(TPila a, int key) {
-//		int lo = 0;
-//		int hi = a.tope;
-//		while (lo <= hi) {
-//			// Key is in a[lo..hi] or not present.
-//			int mid = lo + (hi - lo) / 2;
-//			if (key < BM.BM[a.pila[mid]].getId())
-//				hi = mid - 1;
-//			else if (key > BM.BM[a.pila[mid]].getId())
-//				lo = mid + 1;
-//			else
-//				return true;
-//		}
-//		return false;
-//	}
+	// // Binary search
+	// private static boolean hasElement(TPila a, int key) {
+	// int lo = 0;
+	// int hi = a.tope;
+	// while (lo <= hi) {
+	// // Key is in a[lo..hi] or not present.
+	// int mid = lo + (hi - lo) / 2;
+	// if (key < BM.BM[a.pila[mid]].getId())
+	// hi = mid - 1;
+	// else if (key > BM.BM[a.pila[mid]].getId())
+	// lo = mid + 1;
+	// else
+	// return true;
+	// }
+	// return false;
+	// }
 
 }

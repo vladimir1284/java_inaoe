@@ -17,6 +17,8 @@ public class BasicMatrix {
 	int firstRowOnes, rows, atts;
 	int[] repeatedCount;
 	int[] repeatedAtts;
+	int[][] contraidos; // - Lista de rasgos agrupados.
+	private int porcReduccion;
 
 	public class RepeatedRow {
 		public int index;
@@ -83,6 +85,7 @@ public class BasicMatrix {
 		if (reduce)
 			// Reduce columns
 			reduceColumns();
+		// reducirColumnas();
 
 		// Sort BM
 		ordenInicial();
@@ -94,6 +97,53 @@ public class BasicMatrix {
 		// }
 		// System.out.print("\n");
 		// }
+	}
+
+	// ---------------------------------------------------------------------------
+	// - Metodo para reducir el numero de columnas.
+	// ---------------------------------------------------------------------------
+	public void reducirColumnas() {
+		int i, j;
+		boolean[] band = new boolean[atts];
+		int[][] tempMat = new int[atts][atts];
+		int contColum = 0, maxFila = 0;
+		TuplaBinaria[] BMTemp;
+		// ---------------
+		for (i = 0; i < atts; i++) {
+			band[i] = true;
+		}
+		for (i = 0; i < atts; i++) {
+			tempMat[0][i] = 0;
+			if (band[i] == true) {
+				contColum++;
+				tempMat[0][i] = 1;
+				tempMat[1][i] = BM[i].getId();
+				for (j = atts - 1; j >= i + 1; j--) {
+					if (BM[i].igualA(BM[j]) == true) {
+						tempMat[++tempMat[0][i]][i] = BM[j].getId();
+						band[j] = false; // - marcado como BM usado
+					}
+				}
+				if (maxFila < tempMat[0][i])
+					maxFila = tempMat[0][i];
+			}
+		}
+		BMTemp = new TuplaBinaria[contColum];
+		contraidos = new int[maxFila + 1][contColum];
+		contColum = 0;
+		for (i = 0; i < atts; i++) {
+			if (tempMat[0][i] != 0) {
+				BMTemp[contColum] = BM[i];
+				BMTemp[contColum].idTupla = contColum;
+				for (j = 0; j <= tempMat[0][i]; j++) {
+					contraidos[j][contColum] = tempMat[j][i];
+				}
+				contColum++;
+			}
+		}
+		BM = BMTemp;
+		porcReduccion = (contColum * 100) / atts;
+		atts = contColum; // - Nuevo # de columnas.
 	}
 
 	private void reduceColumns() {
@@ -126,9 +176,9 @@ public class BasicMatrix {
 				}
 			}
 		}
-		System.out.println("Zero columns: " + Integer.toString(emptyCols));
-		System.out.println("Repeated columns: "
-				+ Integer.toString(repeatedCols));
+//		System.out.println("Zero columns: " + Integer.toString(emptyCols));
+//		System.out.println("Repeated columns: "
+//				+ Integer.toString(repeatedCols));
 
 		// New basic matrix
 		TuplaBinaria[] temBM = new TuplaBinaria[remainig];
@@ -317,6 +367,12 @@ public class BasicMatrix {
 	public void ordenInicial() {
 		TuplaBinaria temprow;
 
+		int[] ids = new int[atts];
+
+		for (int i = 0; i < atts; i++) {
+			ids[i] = BM[i].getId();
+		}
+
 		rotar(DERECHA);
 
 		// Poner la fila con menor cantidad de unos al inicio
@@ -334,6 +390,11 @@ public class BasicMatrix {
 		BM[id] = temprow;
 
 		rotar(IZQUIERDA);
+		
+		for (int i = 0; i < atts; i++) {
+			BM[i].idTupla = ids[i];
+		}
+		
 		firstRowOnes = nOnes;
 
 		// Poner columnas con unos en 1ra fila a la izquierda
@@ -352,13 +413,13 @@ public class BasicMatrix {
 
 	// ---------------------------------------------------------------------------
 	private void rotar(int sentido) {
-		int i, j, antNumFilas, antNumColumnas;
+		int i, j, antNumFilas, antatts;
 		TuplaBinaria[] tuplaTemp; // / - Se esta trabajando con get valor
 									// - Hay que cambiar por setValorEnPos()
 		// ----------------
 
 		antNumFilas = rows;
-		antNumColumnas = atts;
+		antatts = atts;
 		tuplaTemp = new TuplaBinaria[rows];
 		for (i = 0; i < rows; i++) {
 			tuplaTemp[i] = new TuplaBinaria(atts, i);
@@ -370,7 +431,7 @@ public class BasicMatrix {
 			}
 		}
 		BM = tuplaTemp;
-		rows = antNumColumnas; // - Inversion del rango. Cambio.
+		rows = antatts; // - Inversion del rango. Cambio.
 		atts = antNumFilas;
 	}
 }
