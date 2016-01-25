@@ -83,13 +83,13 @@ public class BasicMatrix {
 		// Sort BM
 		ordenInicial();
 
-		// Debug printing the BM
-		for (int i = 0; i < rows; i++) {
-			for (int j = 0; j < atts; j++) {
-				System.out.print(BM[j].getValorEn(i) + " ");
-			}
-			System.out.print("\n");
-		}
+//		// Debug printing the BM
+//		for (int i = 0; i < rows; i++) {
+//			for (int j = 0; j < atts; j++) {
+//				System.out.print(BM[j].getValorEn(i) + " ");
+//			}
+//			System.out.print("\n");
+//		}
 	}
 
 	private void reduceColumns() {
@@ -238,13 +238,13 @@ public class BasicMatrix {
 			BMsort[i][0] = Temp;
 			BM[i] = new TuplaBinaria(new String(BMsort[i]));
 		}
-		// // Print sorted BM for testing
-		// for (int r = 0; r < rows; r++) {
-		// for (int i = 0; i < atts; i++) {
-		// System.out.print(BMsort[i][r]);
-		// }
-		// System.out.print('\n');
-		// }
+//		// Print sorted BM for testing
+//		for (int r = 0; r < rows; r++) {
+//			for (int i = 0; i < atts; i++) {
+//				System.out.print(BMsort[i][r]);
+//			}
+//			System.out.print('\n');
+//		}
 	}
 
 	// public boolean typical(TPila testor) {
@@ -353,6 +353,7 @@ public class BasicMatrix {
 		tuplaTemp = new TuplaBinaria[rows];
 		for (i = 0; i < rows; i++) {
 			tuplaTemp[i] = new TuplaBinaria(atts, i);
+			tuplaTemp[i].set(atts, i);
 			for (j = 0; j < atts; j++) {
 				if (sentido == DERECHA)
 					tuplaTemp[i].setValorEn(j, BM[j].getValorEn(rows - 1 - i));

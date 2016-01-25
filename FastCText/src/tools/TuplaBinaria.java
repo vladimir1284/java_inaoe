@@ -69,7 +69,7 @@ public class TuplaBinaria {
 		numUnidades = numBits / zizeOfUnidad;
 		restoBits = numBits % zizeOfUnidad;
 		total = numUnidades > 0 ? numUnidades : 0;
-		total += numBits > 0 ? 1 : 0;
+		total += (restoBits > 0 ? 1 : 0);
 		numUnidades = total;
 		unidad = new int[numUnidades];
 		// Máscaras para la comparación unitaria

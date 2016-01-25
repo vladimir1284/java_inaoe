@@ -54,26 +54,26 @@ public class gapCText {
 			// AMlx = new BMcolumn(BM.getAMlx(AMl, cg.x), rows);
 			// acceptanceMasks[cg.x] = AMlx.data;
 			contributes = !acceptanceMasks[cg.x].mascAcep(AMl, BM.BM[cg.x]);
-			System.out.print(cg);
+			//System.out.print(cg);
 			candidates++;
 
 			if (contributes) {
-				System.out.print(" C");
+				//System.out.print(" C");
 				if (acceptanceMasks[cg.x].esUnitario()) {
-					System.out.print(" SR");
+					//System.out.print(" SR");
 					testor = true;
 					testors++;
 					// Check for typical testor
 					if (BM.typical(cg.Current, acceptanceMasks)) {
 						// TODO decompress reducts
-						System.out.print(" R");
+						//System.out.print(" R");
 						typicalTestors++;
 						typical = true;
 					}
 				}
 			}
 			done = cg.getCurrentCandidate(testor, contributes, typical);
-			System.out.print("\n");
+			//System.out.print("\n");
 		}
 
 		long endTime = System.currentTimeMillis();
