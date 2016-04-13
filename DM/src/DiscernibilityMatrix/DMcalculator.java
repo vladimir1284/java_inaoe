@@ -279,7 +279,7 @@ public class DMcalculator {
 	private static void saveMatrix(String filename, String head,
 			LinkedList<TuplaBinaria> M) {
 		Path p = Paths.get(filename);
-		String new_file = head + p.getFileName().toString().split("\\.")[0]
+		String new_file = p.getParent() + "/" + head + p.getFileName().toString().split("\\.")[0]
 				+ ".txt";
 		try {
 			BufferedWriter out = new BufferedWriter(new FileWriter(new_file));
