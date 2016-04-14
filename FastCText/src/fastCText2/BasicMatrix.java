@@ -196,6 +196,13 @@ public class BasicMatrix {
 		// for (int i = 0; i < atts; i++) {
 		// System.out.println(BM[i].getId());
 		// }
+//		// Print sorted BM for testing
+//		for (int r = 0; r < rows; r++) {
+//			for (int i = 0; i < atts; i++) {
+//				System.out.print(BM[i].getValorEn(r) + " ");
+//			}
+//			System.out.print('\n');
+//		}
 	}
 
 	public boolean typical(LinkedList<Integer> testor,
@@ -297,13 +304,6 @@ public class BasicMatrix {
 			BMsort[i][0] = Temp;
 			BM[i] = new TuplaBinaria(new String(BMsort[i]));
 		}
-		// // Print sorted BM for testing
-		// for (int r = 0; r < rows; r++) {
-		// for (int i = 0; i < atts; i++) {
-		// System.out.print(BMsort[i][r]);
-		// }
-		// System.out.print('\n');
-		// }
 	}
 
 	// public boolean typical(TPila testor) {
@@ -390,11 +390,11 @@ public class BasicMatrix {
 		BM[id] = temprow;
 
 		rotar(IZQUIERDA);
-		
+
 		for (int i = 0; i < atts; i++) {
 			BM[i].idTupla = ids[i];
 		}
-		
+
 		firstRowOnes = nOnes;
 
 		// Poner columnas con unos en 1ra fila a la izquierda
