@@ -15,7 +15,10 @@ public class BasicMatrix {
 	private static final int IZQUIERDA = 1;
 	TuplaBinaria[] BM;
 	int firstRowOnes, rows, atts;
-	LinkedList<RepeatedRow> repeatedList = new LinkedList<RepeatedRow>();
+	int[] repeatedCount;
+	int[] repeatedAtts;
+	int[][] contraidos; // - Lista de rasgos agrupados.
+	private int porcReduccion;
 
 	private class RepeatedRow {
 		public int index;
