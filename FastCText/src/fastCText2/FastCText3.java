@@ -13,7 +13,7 @@ public class FastCText3 {
 	 * @throws IOException
 	 */
 	public static void main(String[] args) throws IOException {
-		int typicalTestors = 0, testors = 0, candidates = 0;
+		long typicalTestors = 0, testors = 0, candidates = 0;
 
 		// check to see if the String array is empty
 		if (args.length != 1) {
@@ -77,9 +77,9 @@ public class FastCText3 {
 		System.out
 				.println("time: " + Long.toString(endTime - startTime) + "ms");
 		System.out.println("Typical testors: "
-				+ Integer.toString(typicalTestors));
-		System.out.println("Testors: " + Integer.toString(testors));
-		System.out.println("Candidates: " + Integer.toString(candidates));
+				+ Long.toString(typicalTestors));
+		System.out.println("Testors: " + Long.toString(testors));
+		System.out.println("Candidates: " + Long.toString(candidates));
 	}
 
 }

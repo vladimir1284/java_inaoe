@@ -91,12 +91,12 @@ public class BasicMatrix {
 		ordenInicial();
 
 		// Debug printing the BM
-		// for (int i = 0; i < rows; i++) {
-		// for (int j = 0; j < atts; j++) {
-		// System.out.print(BM[j].getValorEn(i) + " ");
-		// }
-		// System.out.print("\n");
-		// }
+		for (int i = 0; i < rows; i++) {
+			for (int j = 0; j < atts; j++) {
+				System.out.print(BM[j].getValorEn(i) + " ");
+			}
+			System.out.print("\n");
+		}
 	}
 
 	// ---------------------------------------------------------------------------
@@ -176,9 +176,9 @@ public class BasicMatrix {
 				}
 			}
 		}
-//		System.out.println("Zero columns: " + Integer.toString(emptyCols));
-//		System.out.println("Repeated columns: "
-//				+ Integer.toString(repeatedCols));
+		System.out.println("Zero columns: " + Integer.toString(emptyCols));
+		System.out.println("Repeated columns: "
+				+ Integer.toString(repeatedCols));
 
 		// New basic matrix
 		TuplaBinaria[] temBM = new TuplaBinaria[remainig];
@@ -196,14 +196,13 @@ public class BasicMatrix {
 		// for (int i = 0; i < atts; i++) {
 		// System.out.println(BM[i].getId());
 		// }
-//		// Print sorted BM for testing
-//		for (int r = 0; r < rows; r++) {
-//			for (int i = 0; i < atts; i++) {
-//				System.out.print(BM[i].getValorEn(r) + " ");
-//			}
-//			System.out.print('\n');
-//		}
-
+		// // Print sorted BM for testing
+		// for (int r = 0; r < rows; r++) {
+		// for (int i = 0; i < atts; i++) {
+		// System.out.print(BM[i].getValorEn(r) + " ");
+		// }
+		// System.out.print('\n');
+		// }
 
 	}
 
@@ -306,13 +305,13 @@ public class BasicMatrix {
 			BMsort[i][0] = Temp;
 			BM[i] = new TuplaBinaria(new String(BMsort[i]));
 		}
-//		// Print sorted BM for testing
-//		for (int r = 0; r < rows; r++) {
-//			for (int i = 0; i < atts; i++) {
-//				System.out.print(BMsort[i][r]);
-//			}
-//			System.out.print('\n');
-//		}
+		// // Print sorted BM for testing
+		// for (int r = 0; r < rows; r++) {
+		// for (int i = 0; i < atts; i++) {
+		// System.out.print(BMsort[i][r]);
+		// }
+		// System.out.print('\n');
+		// }
 	}
 
 	// public boolean typical(TPila testor) {
