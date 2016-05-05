@@ -27,6 +27,7 @@ public class DMsimilarity {
 	static boolean nda = false;
 	static boolean miss = false;
 	static long timeDM;
+	static int nbins = 10;
 
 	public static void main(String[] args) throws Exception {
 		CommandLineParser parser = null;
@@ -37,9 +38,9 @@ public class DMsimilarity {
 		// /////////////////////////////////////////////////////////////////////
 
 		Options options = new Options();
-		options.addOption("md", false,
+		options.addOption("mb", false,
 				"Salvar Matriz de Discernibilidad (si no se pide bm, ésta es por defecto)");
-		options.addOption("mb", false, "Salvar Matriz Básica");
+		options.addOption("b", true, "Numero de bins");
 		options.addOption("nda", false, "No usar atributo de desición");
 		options.addOption("miss", false,
 				"Eliminar objetos con falta de información");
@@ -80,12 +81,10 @@ public class DMsimilarity {
 			if (cmdLine.hasOption("miss")) {
 				miss = true;
 			}
-			// Si el usuario pide la BM la salvaremos
-			// Si no, se salvará la DM
-			if (cmdLine.hasOption("mb")) {
-				saveBM = true;
-			} else {
-				saveDM = true;
+			// Si el usuario define el numero de bins
+			if (cmdLine.hasOption("b")) {
+				nbins = Integer.parseInt(cmdLine.getOptionValue( "b" ));
+
 			}
 
 			if (cmdLine.getArgList().size() != 1) {
@@ -314,6 +313,7 @@ public class DMsimilarity {
 	// Save the Matrix to disk
 	private static void saveMatrix(String filename, String head,
 			LinkedList<double[]> M) {
+		double value;
 		Path p = Paths.get(filename);
 		String new_file = head + p.getFileName().toString().split("\\.")[0]
 				+ ".txt";
@@ -328,7 +328,11 @@ public class DMsimilarity {
 			while (iterator.hasNext()) {
 				double[] row =iterator.next();
 				for (int k = 0; k < row.length; k++) {
-					out.write(Double.toString(row[k])+' ');
+					value = row[k];
+					value = value*nbins;
+					value = Math.round(value);
+					value = value/nbins;
+					out.write(Double.toString(value)+' ');
 				}
 				out.write(ls);
 			}
