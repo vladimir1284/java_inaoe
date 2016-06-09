@@ -64,12 +64,20 @@ public class GapCandGen {
 	}
 
 	public String toString() {
-		String candidate = "$";
+		String candidate = "";
 		for (int i = 0; i <= Current.tope; i++) {
-			candidate += "c_" + Current.pila[i] + ",";
+			candidate += Current.pila[i] + 1;
 		}
-		return candidate.substring(0, candidate.length() - 1) + "$";
+		return candidate.substring(0, candidate.length());
 
 	}
+//	public String toString() {
+//		String candidate = "$";
+//		for (int i = 0; i <= Current.tope; i++) {
+//			candidate += "c_" + Current.pila[i] + ",";
+//		}
+//		return candidate.substring(0, candidate.length() - 1) + "$";
+//
+//	}
 
 }

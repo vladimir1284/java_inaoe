@@ -38,8 +38,9 @@ public class DMsimilarity {
 		// /////////////////////////////////////////////////////////////////////
 
 		Options options = new Options();
-		options.addOption("mb", false,
+		options.addOption("md", false,
 				"Salvar Matriz de Discernibilidad (si no se pide bm, ésta es por defecto)");
+		options.addOption("mb", false, "Salvar Matriz Básica");
 		options.addOption("b", true, "Numero de bins");
 		options.addOption("nda", false, "No usar atributo de desición");
 		options.addOption("miss", false,
@@ -70,7 +71,7 @@ public class DMsimilarity {
 			}
 
 			// Si el usuario pide la DM la salvaremos
-			if (cmdLine.hasOption("mb")) {
+			if (cmdLine.hasOption("md")) {
 				saveDM = true;
 			}
 			// No se va a tener en cuenta el atributo de decisión
@@ -86,7 +87,13 @@ public class DMsimilarity {
 				nbins = Integer.parseInt(cmdLine.getOptionValue( "b" ));
 
 			}
-
+			// Si el usuario pide la BM la salvaremos
+			// Si no, se salvará la DM
+			if (cmdLine.hasOption("mb")) {
+				saveBM = true;
+			} else {
+				saveDM = true;
+			}
 			if (cmdLine.getArgList().size() != 1) {
 				throw new ParseException(
 						"El último argumento es el nombre del fichero arff!");
@@ -190,9 +197,12 @@ public class DMsimilarity {
 					} else {
 						switch (data.attribute(k).type()) {
 						case Attribute.NUMERIC: {
-							current_tupla[k] = Math.abs(data.instance(i).value(k) - data.instance(j)
+							double value = Math.abs(data.instance(i).value(k) - data.instance(j)
 									.value(k))/range[k];
-
+							value = value*nbins;
+							value = Math.round(value);
+							value = value/nbins;
+							current_tupla[k] = value;
 							break;
 						}
 						default: {
@@ -313,7 +323,6 @@ public class DMsimilarity {
 	// Save the Matrix to disk
 	private static void saveMatrix(String filename, String head,
 			LinkedList<double[]> M) {
-		double value;
 		Path p = Paths.get(filename);
 		String new_file = head + p.getFileName().toString().split("\\.")[0]
 				+ ".txt";
@@ -328,11 +337,7 @@ public class DMsimilarity {
 			while (iterator.hasNext()) {
 				double[] row =iterator.next();
 				for (int k = 0; k < row.length; k++) {
-					value = row[k];
-					value = value*nbins;
-					value = Math.round(value);
-					value = value/nbins;
-					out.write(Double.toString(value)+' ');
+					out.write(Double.toString(row[k])+' ');
 				}
 				out.write(ls);
 			}
