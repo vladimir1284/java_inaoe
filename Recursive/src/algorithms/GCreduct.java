@@ -1,14 +1,10 @@
-package fastCText2;
+package algorithms;
 
 import java.io.IOException;
-import java.util.Iterator;
-
-import fastCText2.BasicMatrix.RepeatedRow;
-import sun.misc.GC;
-import tools.TPila;
+import tools.BasicMatrix;
 import tools.TuplaBinaria;
 
-public class gapCText {
+public class GCreduct {
 
 	/**
 	 * @param args
@@ -17,7 +13,7 @@ public class gapCText {
 	static BasicMatrix BM;
 
 	public static void main(String[] args) throws IOException {
-		int typicalTestors = 0, testors = 0, candidates = 0;
+		long typicalTestors = 0, testors = 0, candidates = 0;
 
 		// check to see if the String array is empty
 		if (args.length != 1) {
@@ -100,9 +96,9 @@ public class gapCText {
 		System.out
 				.println("time: " + Long.toString(endTime - startTime) + "ms");
 		System.out.println("Typical testors: "
-				+ Integer.toString(typicalTestors));
-		System.out.println("Testors: " + Integer.toString(testors));
-		System.out.println("Candidates: " + Integer.toString(candidates));
+				+ Long.toString(typicalTestors));
+		System.out.println("Testors: " + Long.toString(testors));
+		System.out.println("Candidates: " + Long.toString(candidates));
 	}
 
 	// // Binary search
