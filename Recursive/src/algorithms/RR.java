@@ -12,6 +12,8 @@ public class RR {
 	private static final int DERECHA = 2;
 	private static final int IZQUIERDA = 1;
 
+	private static final boolean DEBUG = true;
+
 	public long contadorComprobaciones = 0;
 
 	private int numColumnas, numFilas, contadorTestores; // - Numero de
@@ -21,6 +23,8 @@ public class RR {
 	private double[] importancia;
 
 	private TuplaBinaria[] rasgo; // - Lista de rasgos de la matriz
+	private TuplaBinaria[] SortedByID; // - Lista de rasgos de la matriz
+										// ordenada x ID
 	private int[] solucion; // - Lista de TT.
 	private int[][] contraidos; // - Lista de rasgos agrupados.
 
@@ -40,7 +44,9 @@ public class RR {
 		numColumnas = columnas;
 		rasgo = new TuplaBinaria[numColumnas];
 		for (int i = 0; i < numColumnas; i++)
-			rasgo[i] = new TuplaBinaria(numFilas, i + 1);
+			// rasgo[i] = new TuplaBinaria(numFilas, i + 1); // Original
+			rasgo[i] = new TuplaBinaria(numFilas, i); // Modified to make ID
+														// start from 0.
 
 	}
 
@@ -322,6 +328,11 @@ public class RR {
 		// registerData.getInfo(Integer.toString(100-porcReduccion)+"% de reduccion de columnas\n");
 		// ****************************************** Oredenar la matriz
 		posUltColumUnitaria = ordenInicial();
+		// Ordenar rasgos x ID
+		SortedByID = new TuplaBinaria[numColumnas];
+		for (int i1 = 0; i1 < numColumnas; i1++) {
+			SortedByID[rasgo[i1].idTupla] = rasgo[i1];
+		}
 		// ****************************************** Inicializacion
 		tempSol = new int[numColumnas];
 		// - Inicializar pilas de mascaras.
@@ -442,11 +453,17 @@ public class RR {
 							// ========= RR ========================
 							// usar la lista dinamica de contraidos
 							int[][] mycontraidos = Lcontraidos[listaIndex];
+							// Saber si es pseudo testor típico
+							boolean pseudoTT = false;
 							// =====================================
 
 							filaSel[++listaIndex] = enCurso_x;
 							top = 0;
 							tempSol[top] = mycontraidos[0][filaSel[top].idTupla];
+
+							if (tempSol[top] > 1)
+								pseudoTT = true;
+
 							solucion[0] = listaIndex + 1; // No. de rasgos del
 															// TT. (cabecera)
 							while (top >= 0) { // - Extarer los TT de los
@@ -459,14 +476,35 @@ public class RR {
 									if (top < listaIndex) {
 										top++;
 										tempSol[top] = mycontraidos[0][filaSel[top].idTupla];
+
+										if (tempSol[top] > 1)
+											pseudoTT = true;
+
 									} else {
 										// registerData.resgistTT(solucion);
-										// Print the solution
-										for (int i1 = 0; i1 < solucion[0]; i1++) {
-											System.out.print("x"
-													+ solucion[i1 + 1]);
+										if (DEBUG) {
+											// Print the solution
+											for (int i1 = 0; i1 < solucion[0]; i1++) {
+												System.out
+														.print("x"
+																+ Integer
+																		.toString(solucion[i1 + 1] + 1));
+											}
+											if (pseudoTT) {
+												pseudoTT = false;
+												TuplaBinaria[] solution = new TuplaBinaria[solucion[0]];
+												for (int i1 = 0; i1 < solucion[0]; i1++) {
+													solution[i1] = SortedByID[solucion[i1 + 1]];
+												}
+
+												if (typical(solution,
+														solucion[0])) {
+													System.out.print('*');
+													contadorTestores--;
+												}
+											}
+											System.out.println();
 										}
-										System.out.println();
 										contadorTestores++;
 									}
 								}
@@ -479,7 +517,7 @@ public class RR {
 												// prox lista.
 							esTestor = true;
 						}
-					} // -Art�culo 176-177 - Reglamento docente..
+					}
 				}
 				// *********************************************************
 				// - Si enCurso_x es no excluyente con l y no forma un TT con el
@@ -523,12 +561,12 @@ public class RR {
 					// }
 					// System.out.println();
 					boolean repeat = false;
-					boolean[] repeated = new boolean[ultimo];
-					int[][] tempMat = new int[ultimo][ultimo];
-
+					boolean[] repeated = new boolean[ultimo + 1];
+					int[][] tempMat = new int[ultimo + 1][ultimo + 1];
+					nrepeated = 0;
 					for (int u = 0; u < ultimo - 1; u++) {
 						if (!repeated[u]) {
-							for (int k = u + 1; k < ultimo; k++) {
+							for (int k = u + 1; k <= ultimo; k++) {
 								if (local_mask[u].igualA(local_mask[k])) {
 									tempMat[++tempMat[0][u]][u] = pMatriz[k][listaIndex]
 											.getId();
@@ -540,14 +578,18 @@ public class RR {
 						}
 					}
 					if (repeat) {
-						// ============= Imprimir la base del candidato
-						// =================
-						System.out.print("Base: ");
-						for (int d = 0; d < listaIndex - 1; d++) {
-							System.out.print("x"
-									+ Integer.toString(filaSel[d].getId() + 1));
+						// if (false) {
+						if (DEBUG) {
+							// === Imprimir la base del candidato ===
+							System.out.print("Base: ");
+							for (int d = 0; d < listaIndex; d++) {
+								System.out
+										.print("x"
+												+ Integer.toString(filaSel[d]
+														.getId() + 1));
+							}
+							System.out.println();
 						}
-						System.out.println();
 						// ==============================================================
 
 						int idx = 0;
@@ -558,11 +600,15 @@ public class RR {
 							contraidos[z] = Lcontraidos[listaIndex - 1][z]
 									.clone();
 
-						for (int i1 = 0; i1 < ultimo; i1++) {
-							System.out.println("rasgo: "
-									+ Integer.toString(pMatriz[i1][listaIndex]
-											.getId() + 1) + ", mask: "
-									+ local_mask[i1]);
+						for (int i1 = 0; i1 <= ultimo; i1++) {
+							if (DEBUG) {
+								System.out
+										.println("rasgo: "
+												+ Integer
+														.toString(pMatriz[i1][listaIndex]
+																.getId() + 1)
+												+ ", mask: " + local_mask[i1]);
+							}
 							if (!repeated[i1]) {
 								pMatriz[idx++][listaIndex] = pMatriz[i1][listaIndex];
 								int curr_id = pMatriz[i1][listaIndex].getId();
@@ -577,28 +623,38 @@ public class RR {
 								}
 							}
 						}
-						System.out.println();
 						// ======= Imprimir Lista de contraidos ===========
-						for (int f1 = 0; f1 < Lcontraidos[listaIndex - 1][0].length; f1++) {
-							System.out.print("Att x"
-									+ Integer.toString(contraidos[1][f1])
-									+ ": ");
-							for (int f2 = 2; f2 < contraidos[0][f1]; f2++) {
-								System.out
-										.print("x"
-												+ Integer
-														.toString(contraidos[f2][f1] + 1));
-							}
+						if (DEBUG) {
 							System.out.println();
+							for (int f1 = 0; f1 < Lcontraidos[listaIndex - 1][0].length; f1++) {
+								System.out
+										.print("Att x"
+												+ Integer
+														.toString(contraidos[1][f1] + 1)
+												+ ": ");
+								for (int f2 = 2; f2 <= contraidos[0][f1]; f2++) {
+									System.out
+											.print("x"
+													+ Integer
+															.toString(contraidos[f2][f1] + 1));
+								}
+								System.out.println();
+							}
 						}
 						// ================================================
-						
+
 						Lcontraidos[listaIndex] = contraidos;
 						ultimo -= nrepeated;
 					} else {
 						// Conservar una referancia a la lista anterior de
 						// contraidos
-						Lcontraidos[listaIndex] = Lcontraidos[listaIndex - 1];
+						// if (Lcontraidos[listaIndex]==null)
+						// Lcontraidos[listaIndex] = Lcontraidos[listaIndex -
+						// 1];
+						// Actualizar hasta el final la listas de contraidos
+						for (int indice = listaIndex; indice <= numColumnas; indice++) {
+							Lcontraidos[indice] = Lcontraidos[listaIndex - 1];
+						}
 					}
 				}
 
@@ -638,6 +694,29 @@ public class RR {
 		 * for (i=0; i<numColumnas; i++) { frecAmplitud[i] /= frecAparicion[i];
 		 * frecAparicion[i] /= contadorTestores; }
 		 */
+	}
+
+	// ******************************************************************
+	// Verify a super reduct as reduct by using compatibility
+	// This is intended for super reducts araising from repeated
+	// attibutes in RR.
+	// ******************************************************************
+	private boolean typical(TuplaBinaria[] superreduct, int natts) {
+		// Get testor's compatibility mask
+		TuplaBinaria AMl = new TuplaBinaria(superreduct[0]);
+		TuplaBinaria CMl = new TuplaBinaria(superreduct[0]);
+		int i;
+		for (i = 1; i < natts; i++) {
+			CMl.mascComp(CMl, superreduct[i], AMl);
+			AMl.mascAcep(AMl, superreduct[i]);
+		}
+		// Check that every attribute in testor has a typical row
+		for (i = 0; i < natts; i++) {
+			if (superreduct[i].andNEqZ(CMl)) {
+				return false;
+			}
+		}
+		return true;
 	}
 
 	// ---------------------------------------------------------------------------
