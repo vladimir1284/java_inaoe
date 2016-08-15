@@ -330,8 +330,17 @@ public class RR {
 		posUltColumUnitaria = ordenInicial();
 		// Ordenar rasgos x ID
 		SortedByID = new TuplaBinaria[numColumnas];
+		if (DEBUG) {
+			System.out.print("final order: ");
+		}
 		for (int i1 = 0; i1 < numColumnas; i1++) {
+			if (DEBUG) {
+				System.out.print("x" + Integer.toString(rasgo[i1].idTupla + 1));
+			}
 			SortedByID[rasgo[i1].idTupla] = rasgo[i1];
+		}
+		if (DEBUG) {
+			System.out.println();
 		}
 		// ****************************************** Inicializacion
 		tempSol = new int[numColumnas];
@@ -429,59 +438,70 @@ public class RR {
 				seAcepta = false; // - Si no se cumple la condicion #1
 				if (mascaraAcep[listaIndex + 1].mascAcep(
 						mascaraAcep[listaIndex], enCurso_x) == false) {
-					mascaraComp[listaIndex + 1].mascComp(
-							mascaraComp[listaIndex], enCurso_x,
-							mascaraAcep[listaIndex]);
-					condicion2 = false;
-					for (i = 0; i <= listaIndex; i++) { // - Condicion #2
-						if (filaSel[i].and(mascaraComp[listaIndex + 1]) == true) {
-							condicion2 = true;
-							break;
-						}
-					}
-					if (condicion2 == false) {
-						seAcepta = true; // - PROPOSICI�N 2.5 - Condicion #3.
-						if (mascaraAcep[listaIndex + 1].esUnitario()) { // -
-																		// l+[enCurso_x]
-																		// �es
-																		// un
-																		// TT?
-							// vvvvvvvvvvvvvvvvvvvvvvv - REGISTRAR TT -
-							// vvvvvvvvvvvvvvvvvvvvvvv
-							// if (contadorTestores < 1000000) {
+					// mascaraComp[listaIndex + 1].mascComp(
+					// mascaraComp[listaIndex], enCurso_x,
+					// mascaraAcep[listaIndex]);
+					// condicion2 = false;
+					// for (i = 0; i <= listaIndex; i++) { // - Condicion #2
+					// if (filaSel[i].and(mascaraComp[listaIndex + 1]) == true)
+					// {
+					// condicion2 = true;
+					// break;
+					// }
+					// }
+					// if (condicion2 == false) {
+					seAcepta = true; // - PROPOSICI�N 2.5 - Condicion #3.
+					if (mascaraAcep[listaIndex + 1].esUnitario()) {// Es super
+																	// reducto
+						// seAcepta = true; // - PROPOSICI�N 2.5 - Condicion #3.
+						// if (mascaraAcep[listaIndex + 1].esUnitario()) { // -
+						// l+[enCurso_x]
+						// �es
+						// un
+						// TT?
+						// vvvvvvvvvvvvvvvvvvvvvvv - REGISTRAR TT -
+						// vvvvvvvvvvvvvvvvvvvvvvv
+						// if (contadorTestores < 1000000) {
 
-							// ========= RR ========================
-							// usar la lista dinamica de contraidos
-							int[][] mycontraidos = Lcontraidos[listaIndex];
-							// Saber si es pseudo testor típico
-							boolean pseudoTT = false;
-							// =====================================
+						// ========= RR ========================
+						// usar la lista dinamica de contraidos
+						int[][] mycontraidos = Lcontraidos[listaIndex];
+						// Saber si es pseudo testor típico
+						// bboolean pseudoTT = false;
+						// =====================================
 
-							filaSel[++listaIndex] = enCurso_x;
-							top = 0;
-							tempSol[top] = mycontraidos[0][filaSel[top].idTupla];
+						filaSel[++listaIndex] = enCurso_x;
+						top = 0;
+						tempSol[top] = mycontraidos[0][filaSel[top].idTupla];
 
-							if (tempSol[top] > 1)
-								pseudoTT = true;
+						// if (tempSol[top] > 1)
+						// pseudoTT = true;
 
-							solucion[0] = listaIndex + 1; // No. de rasgos del
-															// TT. (cabecera)
-							while (top >= 0) { // - Extarer los TT de los
-												// pseudoTT.
-								if (tempSol[top] == 0)
-									top--;
-								else {
-									solucion[top + 1] = mycontraidos[tempSol[top]][filaSel[top].idTupla];
-									tempSol[top]--;
-									if (top < listaIndex) {
-										top++;
-										tempSol[top] = mycontraidos[0][filaSel[top].idTupla];
+						solucion[0] = listaIndex + 1; // No. de rasgos del
+														// TT. (cabecera)
+						while (top >= 0) { // - Extarer los TT de los
+											// pseudoTT.
+							if (tempSol[top] == 0)
+								top--;
+							else {
+								solucion[top + 1] = mycontraidos[tempSol[top]][filaSel[top].idTupla];
+								tempSol[top]--;
+								if (top < listaIndex) {
+									top++;
+									tempSol[top] = mycontraidos[0][filaSel[top].idTupla];
 
-										if (tempSol[top] > 1)
-											pseudoTT = true;
+									// if (tempSol[top] > 1)
+									// pseudoTT = true;
 
-									} else {
-										// registerData.resgistTT(solucion);
+								} else {
+									// registerData.resgistTT(solucion);
+									TuplaBinaria[] solution = new TuplaBinaria[solucion[0]];
+									for (int i1 = 0; i1 < solucion[0]; i1++) {
+										solution[i1] = SortedByID[solucion[i1 + 1]];
+									}
+									if (typical(solution, solucion[0])) {
+										contadorTestores++;
+
 										if (DEBUG) {
 											// Print the solution
 											for (int i1 = 0; i1 < solucion[0]; i1++) {
@@ -490,14 +510,11 @@ public class RR {
 																+ Integer
 																		.toString(solucion[i1 + 1] + 1));
 											}
-											if (pseudoTT) {
-												pseudoTT = false;
-												TuplaBinaria[] solution = new TuplaBinaria[solucion[0]];
-												for (int i1 = 0; i1 < solucion[0]; i1++) {
-													solution[i1] = SortedByID[solucion[i1 + 1]];
-												}
+											// if (pseudoTT) {
+											if (true) {
+												// pseudoTT = false;
 
-												if (typical(solution,
+												if (!typical(solution,
 														solucion[0])) {
 													System.out.print('*');
 													contadorTestores--;
@@ -505,19 +522,20 @@ public class RR {
 											}
 											System.out.println();
 										}
-										contadorTestores++;
 									}
+
 								}
 							}
-							listaIndex--;
-							// }
-							// ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-							// - como l + [enCurso_x] forman un TT entonces
-							seAcepta = false; // - enCurso_x no se agrega a la
-												// prox lista.
-							esTestor = true;
 						}
+						listaIndex--;
+						// }
+						// ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+						// - como l + [enCurso_x] forman un TT entonces
+						seAcepta = false; // - enCurso_x no se agrega a la
+											// prox lista.
+						esTestor = true;
 					}
+					// }
 				}
 				// *********************************************************
 				// - Si enCurso_x es no excluyente con l y no forma un TT con el
@@ -577,6 +595,12 @@ public class RR {
 							}
 						}
 					}
+
+					int[][] contraidos = new int[numColumnas][Lcontraidos[listaIndex - 1][0].length];
+					// Copy the previous array
+					for (int z = 0; z < Lcontraidos[listaIndex - 1].length; z++)
+						contraidos[z] = Lcontraidos[listaIndex - 1][z].clone();
+
 					if (repeat) {
 						// if (false) {
 						if (DEBUG) {
@@ -594,12 +618,6 @@ public class RR {
 
 						int idx = 0;
 						// Actualizar la lista de contraidos
-						int[][] contraidos = new int[numColumnas][Lcontraidos[listaIndex - 1][0].length];
-						// Copy the previous array
-						for (int z = 0; z < Lcontraidos[listaIndex - 1].length; z++)
-							contraidos[z] = Lcontraidos[listaIndex - 1][z]
-									.clone();
-
 						for (int i1 = 0; i1 <= ultimo; i1++) {
 							if (DEBUG) {
 								System.out
@@ -643,29 +661,33 @@ public class RR {
 						}
 						// ================================================
 
-						Lcontraidos[listaIndex] = contraidos;
+						// Lcontraidos[listaIndex] = contraidos;
 						ultimo -= nrepeated;
-					} else {
-						// Conservar una referancia a la lista anterior de
-						// contraidos
-						// if (Lcontraidos[listaIndex]==null)
-						// Lcontraidos[listaIndex] = Lcontraidos[listaIndex -
-						// 1];
-						// Actualizar hasta el final la listas de contraidos
-						for (int indice = listaIndex; indice <= numColumnas; indice++) {
-							Lcontraidos[indice] = Lcontraidos[listaIndex - 1];
-						}
+						repeat = false;
 					}
+					// Conservar una referancia a la lista anterior de
+					// contraidos
+					// if (Lcontraidos[listaIndex]==null)
+					// Lcontraidos[listaIndex] = Lcontraidos[listaIndex -
+					// 1];
+					// Actualizar hasta el final la listas de contraidos
+					Lcontraidos[listaIndex] = contraidos;
+//					for (int indice = listaIndex+1; indice <= numColumnas; indice++) {
+//						Lcontraidos[indice] = null;
+//
+//					}
 				}
 
 				// ====================================================================
 
 				// -> Ir al paso 3
 				continue; // break paso_3;
-
-			} else if (seAcepta == true || esTestor) { // - Eliminar el hueco.
-														// tl = elimK(tl,
-														// hueco(l', tl))
+				// TODO revisar lo q pasa con el gap
+				// } else if (seAcepta == true || esTestor) { // - Eliminar el
+				// hueco.
+			} else if (false) { // - Eliminar el hueco.
+								// tl = elimK(tl,
+								// hueco(l', tl))
 				hueco = listaIndex - 1;
 				while (true) {
 					if (hueco <= 0)
