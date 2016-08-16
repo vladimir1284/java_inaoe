@@ -69,8 +69,8 @@ public class RecursiveMain {
 		System.out
 				.println("time: " + Long.toString(endTime - startTime) + "ms");
 		System.out.println("Typical testors: "
-				+ Integer.toString(rrAlgorithm.getNumSoluciones()));
-		System.out.println("Testors: " + Integer.toString(rrAlgorithm.getNumSoluciones()));
+				+ Integer.toString(rrAlgorithm.contadorTTs));
+		System.out.println("Testors: " + Integer.toString(rrAlgorithm.contadorTestores));
 		System.out.println("Candidates: " + Long.toString(rrAlgorithm.contadorComprobaciones));
 	}
 

@@ -1,7 +1,7 @@
 package tools;
 
 public class Solution {
-	private int length;
+	public int length;
 	private TuplaBinaria[] attsArray;
 	public Solution(int length) {
 		this.length = length;
@@ -15,5 +15,8 @@ public class Solution {
 	}
 	public void setAttribute(int pos, TuplaBinaria att){
 		attsArray[pos] =  att;
+	}
+	public TuplaBinaria getAttribute(int pos){
+		return attsArray[pos];
 	}
 }

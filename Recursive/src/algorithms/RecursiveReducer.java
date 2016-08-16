@@ -13,10 +13,12 @@ public class RecursiveReducer {
 
 	public long contadorComprobaciones = 0;
 
-	private int numColumnas, numFilas, contadorTestores, contadorTTs; // -
+	private int numColumnas, numFilas; // -
+	int contadorTestores;
 																		// Numero
 																		// de
 	// soluciones.
+	int contadorTTs;
 
 	private TuplaBinaria[] rasgo; // - Lista de rasgos de la matriz
 	private LinkedList<Solution> soluciones; // - Lista de TT.
@@ -325,11 +327,13 @@ public class RecursiveReducer {
 	public void extraerTT(RegisterData registerData) {
 		int listaIndex, primero, ultimo, proxUltimo, i, j, hueco, p, f;
 		int posUltColumUnitaria;
-		boolean condicion2, seAcepta = true, esTestor = true;
+		boolean seAcepta = true, isTypical = true;
 		int tempSol[], top = 0; // - arreglo temporal para extraer los TT
 								// compactados.
 
 		TuplaBinaria rasgo_X, enCurso_x;
+		// Último TT encontrado
+		Solution lastTT;
 		// - Lista de rasgos seleccionadas de MB para formar un TT (l en el
 		// algoritmo).
 		TuplaBinaria[] filaSel;
@@ -344,7 +348,7 @@ public class RecursiveReducer {
 		TuplaBinaria[][][] repeated;
 		// - Matriz que guarda la cantidad de rasgos repetidos para cada
 		// rasgo acceptado en cada nivel de la recursividad.
-		int countRepated[][];
+		int countRepeated[][];
 
 		TPila pilaPrimero = new TPila();
 		TPila pilaUltimo = new TPila();
@@ -354,19 +358,21 @@ public class RecursiveReducer {
 		// ******************* Inicialización ***********************
 		tempSol = new int[numColumnas];
 		// - Inicializar pilas de mascaras.
-		accepted = new TuplaBinaria[numColumnas + 1][];
+		accepted = new TuplaBinaria[numColumnas + 1][numColumnas + 1];
 		acceptedMasks = new TuplaBinaria[numColumnas + 1][];
+		repeated = new TuplaBinaria[numColumnas + 1][numColumnas + 1][numColumnas + 1];
 		for (i = 0; i <= numColumnas; i++) {
 			acceptedMasks[i] = new TuplaBinaria[numColumnas + 1];
-			accepted[i] = new TuplaBinaria[numColumnas + 1];
 			for (j = 0; j <= numColumnas; j++) {
 				acceptedMasks[i][j] = new TuplaBinaria(numFilas, 0);
 			}
 		}
+		countRepeated = new int[numColumnas][numColumnas];
+		
 		// ************** Reducir el numero de columnas **************
-		reducirColumnas(countRepated[0], repeated[0], accepted[0]);
+		reducirColumnas(countRepeated[0], repeated[0], accepted[0]);
 		// - Inicializar las máscaras de nivel 0 con los rasgos iniciales
-		for (j = 0; j <= numColumnas; j++) {
+		for (j = 0; j < numColumnas; j++) {
 			acceptedMasks[0][accepted[0][j].getId()] = accepted[0][j];
 		}
 		filaSel = new TuplaBinaria[numColumnas + 1];
@@ -411,67 +417,53 @@ public class RecursiveReducer {
 				enCurso_x = accepted[listaIndex][j]; // Rasgo actual
 				contadorComprobaciones++;
 
-				esTestor = false;
+				isTypical = false;
 				seAcepta = false;
 				if (acceptedMasks[listaIndex + 1][enCurso_x.getId()].mascAcep(
-						acceptedMasks[listaIndex][accepted[listaIndex][j]
+						acceptedMasks[listaIndex][filaSel[listaIndex]
 								.getId()], enCurso_x) == false) {
 					seAcepta = true; // Contribuye
 					// Si es super-reducto
 					if (acceptedMasks[listaIndex + 1][enCurso_x.getId()]
 							.esUnitario()) {
+						seAcepta = false;
 
 						filaSel[++listaIndex] = enCurso_x;
 						top = 0;
-						tempSol[top] = countRepated[listaIndex][top];
+						tempSol[top] = countRepeated[listaIndex][top] + 1;
 
-						Solution solucion = new Solution(listaIndex + 1); // No.
-																			// de
-																			// rasgos
-																			// del
-						// TT. (cabecera)
 						while (top >= 0) { // - Extarer los TT de los
 											// pseudoTT.
-							if (tempSol[top] == 0)
+							Solution solucion = new Solution(listaIndex + 1);
+							
+							if (tempSol[top] == 0) {
 								top--;
-							else {
-								solucion[top + 1] = mycontraidos[tempSol[top]][filaSel[top].idTupla];
+							} else {
+								if (tempSol[top] == 1) {
+									solucion.setAttribute(top, filaSel[top]);
+								} else {
+									solucion.setAttribute(top,
+											repeated[listaIndex][filaSel[top]
+													.getId()][tempSol[top] - 2]);
+								}
 								tempSol[top]--;
 								if (top < listaIndex) {
 									top++;
-									tempSol[top] = mycontraidos[0][filaSel[top].idTupla];
-
-									// if (tempSol[top] > 1)
-									// pseudoTT = true;
+									tempSol[top] = countRepeated[listaIndex][top] + 1;
 
 								} else {
-									// registerData.resgistTT(solucion);
-									TuplaBinaria[] solution = new TuplaBinaria[solucion[0]];
-									for (int i1 = 0; i1 < solucion[0]; i1++) {
-										solution[i1] = SortedByID[solucion[i1 + 1]];
-									}
-									if (typical(solution, solucion[0])) {
-										contadorTestores++;
+									contadorTestores++;
+									if (typical(solucion)) {
+										isTypical = true;
+										lastTT = solucion;
+										soluciones.add(solucion);
+										contadorTTs++;
 
-										if (DEBUG) {
+										if (DEBUG) 
 											// Print the solution
-											for (int i1 = 0; i1 < solucion[0]; i1++) {
-												System.out
-														.print("x"
-																+ Integer
-																		.toString(solucion[i1 + 1] + 1));
-											}
-											// if (pseudoTT) {
-											if (true) {
-												// pseudoTT = false;
+											System.out.println(solucion);
+											
 
-												if (!typical(solution,
-														solucion[0])) {
-													System.out.print('*');
-													contadorTestores--;
-												}
-											}
-											System.out.println();
 										}
 									}
 
@@ -484,22 +476,27 @@ public class RecursiveReducer {
 						// - como l + [enCurso_x] forman un TT entonces
 						seAcepta = false; // - enCurso_x no se agrega a la
 											// prox lista.
-						esTestor = true;
+						isTypical = true;
 					}
-					// }
-				}
+
 				// *********************************************************
 				// - Si enCurso_x es no excluyente con l y no forma un TT con el
 				// mismo.
 				if (seAcepta) {
-					// - Agrego enCurso_x a proxima lista (l_1);
-					pMatriz[++proxUltimo][listaIndex + 1] = enCurso_x;
+					// - Agrego enCurso_x a los aceptados del proximo nivel de recursividad
+					//   si no está repetida su máscara de aceptación.
+					boolean isRepated = false;
+					for(i=0;i<=proxUltimo;i++){
+						if(acceptedMasks[listaIndex + 1][accepted[listaIndex + 1][i].getId()].igualA(enCurso_x)){
+							// Está repetido en los proximos niveles de recursividad
+							repeated[listaIndex + 1][accepted[listaIndex + 1][i].getId()][countRepeated[listaIndex + 1][accepted[listaIndex + 1][i].getId()]++]=enCurso_x;
+							isRepated = true;
+							break;
+						}
+					}
+					if (!isRepated)
+						accepted[listaIndex + 1][++proxUltimo] = enCurso_x;
 
-					// ======================= RR =========================
-					// Recordar las máscaras locales para la reducción dinámica
-					local_mask[proxUltimo] = new TuplaBinaria(
-							mascaraAcep[listaIndex + 1]);
-					// ====================================================
 
 				}
 			}// for
@@ -520,115 +517,37 @@ public class RecursiveReducer {
 				primero = 0; // - Se actualiza los rangos de la proxima lista.
 				ultimo = proxUltimo;
 
-				// ================= Main Modifications for RR =================
-				// Aquí se tienen todos los candidatos del siguiente nivel
-				int min_num_atts = 3; // Para menos attributos no vale la pena
-				if (ultimo >= min_num_atts) {
-					// for (int i1 = 0; i1 < ultimo; i1++) {
-					// // System.out.print(pMatriz[i1][listaIndex].getId()+",");
-					// System.out.print(local_mask[i1] + ";");
-					// }
-					// System.out.println();
-					boolean repeat = false;
-					boolean[] repeated = new boolean[ultimo + 1];
-					int[][] tempMat = new int[ultimo + 1][ultimo + 1];
-					nrepeated = 0;
-					for (int u = 0; u < ultimo - 1; u++) {
-						if (!repeated[u]) {
-							for (int k = u + 1; k <= ultimo; k++) {
-								if (local_mask[u].igualA(local_mask[k])) {
-									tempMat[++tempMat[0][u]][u] = pMatriz[k][listaIndex]
-											.getId();
-									nrepeated++;
-									repeat = true;
-									repeated[k] = true; // Marcar como usado
-								}
-							}
-						}
+				if (DEBUG) {
+					// === Imprimir la base del candidato ===
+					System.out.print("Base: ");
+					for (int d = 0; d < listaIndex; d++) {
+						System.out
+								.print("x"
+										+ Integer.toString(filaSel[d]
+												.getId() + 1));
 					}
-
-					int[][] contraidos = new int[numColumnas][Lcontraidos[listaIndex - 1][0].length];
-					// Copy the previous array
-					for (int z = 0; z < Lcontraidos[listaIndex - 1].length; z++)
-						contraidos[z] = Lcontraidos[listaIndex - 1][z].clone();
-
-					if (repeat) {
-						// if (false) {
-						if (DEBUG) {
-							// === Imprimir la base del candidato ===
-							System.out.print("Base: ");
-							for (int d = 0; d < listaIndex; d++) {
-								System.out
-										.print("x"
-												+ Integer.toString(filaSel[d]
-														.getId() + 1));
-							}
-							System.out.println();
-						}
-						// ==============================================================
-
-						int idx = 0;
-						// Actualizar la lista de contraidos
-						for (int i1 = 0; i1 <= ultimo; i1++) {
-							if (DEBUG) {
-								System.out
-										.println("rasgo: "
-												+ Integer
-														.toString(pMatriz[i1][listaIndex]
-																.getId() + 1)
-												+ ", mask: " + local_mask[i1]);
-							}
-							if (!repeated[i1]) {
-								pMatriz[idx++][listaIndex] = pMatriz[i1][listaIndex];
-								int curr_id = pMatriz[i1][listaIndex].getId();
-
-								for (int r = 0; r < tempMat[0][i1]; r++) {
-									// For each local repeated
-									int repeated_id = tempMat[r + 1][i1];
-									for (int lr = 0; lr < contraidos[0][repeated_id]; lr++) {
-										// For each original repeated
-										contraidos[++contraidos[0][curr_id]][curr_id] = contraidos[lr + 1][repeated_id];
-									}
-								}
-							}
-						}
+					System.out.println();
+				}
 						// ======= Imprimir Lista de contraidos ===========
 						if (DEBUG) {
 							System.out.println();
-							for (int f1 = 0; f1 < Lcontraidos[listaIndex - 1][0].length; f1++) {
+							for (i = primero; i <= ultimo; i++) {
 								System.out
 										.print("Att x"
 												+ Integer
-														.toString(contraidos[1][f1] + 1)
+														.toString(accepted[listaIndex][i].getId() + 1)
 												+ ": ");
-								for (int f2 = 2; f2 <= contraidos[0][f1]; f2++) {
+								for (j = 0; j < countRepeated[listaIndex][accepted[listaIndex][i].getId()]; j++) {
 									System.out
 											.print("x"
 													+ Integer
-															.toString(contraidos[f2][f1] + 1));
+															.toString(repeated[listaIndex][accepted[listaIndex][i].getId()][j].getId() + 1));
 								}
 								System.out.println();
 							}
 						}
-						// ================================================
-
-						// Lcontraidos[listaIndex] = contraidos;
-						ultimo -= nrepeated;
-						repeat = false;
-					}
-					// Conservar una referancia a la lista anterior de
-					// contraidos
-					// if (Lcontraidos[listaIndex]==null)
-					// Lcontraidos[listaIndex] = Lcontraidos[listaIndex -
-					// 1];
-					// Actualizar hasta el final la listas de contraidos
-					Lcontraidos[listaIndex] = contraidos;
-					// for (int indice = listaIndex+1; indice <= numColumnas;
-					// indice++) {
-					// Lcontraidos[indice] = null;
-					//
-					// }
-				}
+					
+				
 
 				// ====================================================================
 
@@ -675,18 +594,18 @@ public class RecursiveReducer {
 	// This is intended for super reducts araising from repeated
 	// attibutes in RR.
 	// ******************************************************************
-	private boolean typical(TuplaBinaria[] superreduct, int natts) {
+	private boolean typical(Solution superreduct) {
 		// Get testor's compatibility mask
-		TuplaBinaria AMl = new TuplaBinaria(superreduct[0]);
-		TuplaBinaria CMl = new TuplaBinaria(superreduct[0]);
+		TuplaBinaria AMl = new TuplaBinaria(superreduct.getAttribute(0));
+		TuplaBinaria CMl = new TuplaBinaria(superreduct.getAttribute(0));
 		int i;
-		for (i = 1; i < natts; i++) {
-			CMl.mascComp(CMl, superreduct[i], AMl);
-			AMl.mascAcep(AMl, superreduct[i]);
+		for (i = 1; i < superreduct.length; i++) {
+			CMl.mascComp(CMl, superreduct.getAttribute(i), AMl);
+			AMl.mascAcep(AMl, superreduct.getAttribute(i));
 		}
 		// Check that every attribute in testor has a typical row
-		for (i = 0; i < natts; i++) {
-			if (superreduct[i].andNEqZ(CMl)) {
+		for (i = 0; i < superreduct.length; i++) {
+			if (superreduct.getAttribute(i).andNEqZ(CMl)) {
 				return false;
 			}
 		}
@@ -699,7 +618,7 @@ public class RecursiveReducer {
 	}
 
 	// ---------------------------------------------------------------------------
-	public void operatorIgual(RR objeto) {
+	public void operatorIgual(RecursiveReducer objeto) {
 		int i, j;
 		int nFilas, nColumnas;
 		// ----------
@@ -713,21 +632,4 @@ public class RecursiveReducer {
 		}
 	}
 
-	// ---------------------------------------------------------------------------
-	public double[] extraerImportancia(double alpha, double beta) {
-		int i;
-		// -----------------
-		// return frecAparicion;
-		// return frecAmplitud;
-		if (numColumnas > 0) {
-			if (importancia == null)
-				importancia = new double[numColumnas];
-			for (i = 0; i < numColumnas; i++) {
-				importancia[i] = alpha * frecAparicion[i] + beta
-						* frecAmplitud[i];
-			}
-			return importancia;
-		}
-		return null;
-	}
 }
