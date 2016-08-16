@@ -13,7 +13,9 @@ public class RecursiveReducer {
 
 	public long contadorComprobaciones = 0;
 
-	private int numColumnas, numFilas, contadorTestores, contadorTTs; // - Numero de
+	private int numColumnas, numFilas, contadorTestores, contadorTTs; // -
+																		// Numero
+																		// de
 	// soluciones.
 
 	private TuplaBinaria[] rasgo; // - Lista de rasgos de la matriz
@@ -98,25 +100,26 @@ public class RecursiveReducer {
 	// ---------------------------------------------------------------------------
 	// - Metodo para reducir el numero de columnas.
 	// ---------------------------------------------------------------------------
-	public void reducirColumnas(int[] countInitalRepated, 
+	public void reducirColumnas(int[] countInitalRepated,
 			TuplaBinaria[][] initalRepated, TuplaBinaria[] initalAccepted) {
 		int i, j;
 		boolean[] flag = new boolean[numColumnas];
 		for (i = 0; i < numColumnas; i++) {
 			flag[i] = true; // Not repeated
 		}
-		
+
 		// ---------------
 		int contColum = 0;
 		for (i = 0; i < numColumnas; i++) {
+			countInitalRepated[rasgo[i].getId()] = 0;
 			if (flag[i] == true) {
 				contColum++;
 				initalAccepted[contColum - 1] = rasgo[i];
-				countInitalRepated[contColum - 1] = 0;
 				for (j = i + 1; j < numColumnas; j++) {
 					if (rasgo[i].igualA(rasgo[j]) == true) {
 						flag[j] = false;
-						initalRepated[contColum - 1][countInitalRepated[contColum - 1]++] = rasgo[j];
+						initalRepated[rasgo[i].getId()][countInitalRepated[rasgo[i]
+								.getId()]++] = rasgo[j];
 					}
 				}
 			}
@@ -124,51 +127,53 @@ public class RecursiveReducer {
 		numColumnas = contColum;
 	}
 
+	// //
 	// ---------------------------------------------------------------------------
-	// - Metodo para reducir el numero de columnas.
+	// // - Metodo para reducir el numero de columnas.
+	// //
 	// ---------------------------------------------------------------------------
-	public void reducirColumnasOld() {
-		int i, j;
-		boolean[] band = new boolean[numColumnas];
-		int[][] tempMat = new int[numColumnas][numColumnas];
-		int contColum = 0, maxFila = 0;
-		TuplaBinaria[] rasgoTemp;
-		// ---------------
-		for (i = 0; i < numColumnas; i++) {
-			band[i] = true;
-		}
-		for (i = 0; i < numColumnas; i++) {
-			tempMat[0][i] = 0;
-			if (band[i] == true) {
-				contColum++;
-				tempMat[0][i] = 1;
-				tempMat[1][i] = rasgo[i].getId();
-				for (j = numColumnas - 1; j >= i + 1; j--) {
-					if (rasgo[i].igualA(rasgo[j]) == true) {
-						tempMat[++tempMat[0][i]][i] = rasgo[j].getId();
-						band[j] = false; // - marcado como rasgo usado
-					}
-				}
-				if (maxFila < tempMat[0][i])
-					maxFila = tempMat[0][i];
-			}
-		}
-		rasgoTemp = new TuplaBinaria[contColum];
-		contraidos = new int[maxFila + 1][contColum];
-		contColum = 0;
-		for (i = 0; i < numColumnas; i++) {
-			if (tempMat[0][i] != 0) {
-				rasgoTemp[contColum] = rasgo[i];
-				rasgoTemp[contColum].idTupla = contColum;
-				for (j = 0; j <= tempMat[0][i]; j++) {
-					contraidos[j][contColum] = tempMat[j][i];
-				}
-				contColum++;
-			}
-		}
-		rasgo = rasgoTemp;
-		numColumnas = contColum; // - Nuevo # de columnas.
-	}
+	// public void reducirColumnasOld() {
+	// int i, j;
+	// boolean[] band = new boolean[numColumnas];
+	// int[][] tempMat = new int[numColumnas][numColumnas];
+	// int contColum = 0, maxFila = 0;
+	// TuplaBinaria[] rasgoTemp;
+	// // ---------------
+	// for (i = 0; i < numColumnas; i++) {
+	// band[i] = true;
+	// }
+	// for (i = 0; i < numColumnas; i++) {
+	// tempMat[0][i] = 0;
+	// if (band[i] == true) {
+	// contColum++;
+	// tempMat[0][i] = 1;
+	// tempMat[1][i] = rasgo[i].getId();
+	// for (j = numColumnas - 1; j >= i + 1; j--) {
+	// if (rasgo[i].igualA(rasgo[j]) == true) {
+	// tempMat[++tempMat[0][i]][i] = rasgo[j].getId();
+	// band[j] = false; // - marcado como rasgo usado
+	// }
+	// }
+	// if (maxFila < tempMat[0][i])
+	// maxFila = tempMat[0][i];
+	// }
+	// }
+	// rasgoTemp = new TuplaBinaria[contColum];
+	// contraidos = new int[maxFila + 1][contColum];
+	// contColum = 0;
+	// for (i = 0; i < numColumnas; i++) {
+	// if (tempMat[0][i] != 0) {
+	// rasgoTemp[contColum] = rasgo[i];
+	// rasgoTemp[contColum].idTupla = contColum;
+	// for (j = 0; j <= tempMat[0][i]; j++) {
+	// contraidos[j][contColum] = tempMat[j][i];
+	// }
+	// contColum++;
+	// }
+	// }
+	// rasgo = rasgoTemp;
+	// numColumnas = contColum; // - Nuevo # de columnas.
+	// }
 
 	// ---------------------------------------------------------------------------
 	// ***************************************************************************
@@ -359,10 +364,10 @@ public class RecursiveReducer {
 			}
 		}
 		// ************** Reducir el numero de columnas **************
-		reducirColumnas(countRepated[0],repeated[0],accepted[0]);
+		reducirColumnas(countRepated[0], repeated[0], accepted[0]);
 		// - Inicializar las máscaras de nivel 0 con los rasgos iniciales
 		for (j = 0; j <= numColumnas; j++) {
-			acceptedMasks[0][j] = accepted[0][j];
+			acceptedMasks[0][accepted[0][j].getId()] = accepted[0][j];
 		}
 		filaSel = new TuplaBinaria[numColumnas + 1];
 		listaIndex = 0;
@@ -375,7 +380,7 @@ public class RecursiveReducer {
 		// - Número de testores calculados.
 		contadorTestores = 0;
 		contadorTTs = 0;
-		
+
 		paso_3: // ****************************************** Proceso
 		while (true) {
 			// Tomar el primer rasgo acceptado
@@ -396,30 +401,35 @@ public class RecursiveReducer {
 					primero++;
 					continue paso_3;
 				}
-			} 
+			}
 			filaSel[listaIndex] = rasgo_X;
 
-			// -> Hacer l_1 = incl(l, prox(lu)) y ctt = ctt U TT(l, prox(lu))
+			// Verificar la contribución
 			proxUltimo = -1;
-			for (j = primero + 1; j <= ultimo; j++) { // Para cada rasgo aceptado
+			for (j = primero + 1; j <= ultimo; j++) { // Para cada rasgo
+														// aceptado
 				enCurso_x = accepted[listaIndex][j]; // Rasgo actual
 				contadorComprobaciones++;
 
 				esTestor = false;
-				seAcepta = false; 
-				if (acceptedMasks[listaIndex + 1][proxUltimo+1].mascAcep(
-						acceptedMasks[listaIndex][j], enCurso_x) == false) {
+				seAcepta = false;
+				if (acceptedMasks[listaIndex + 1][enCurso_x.getId()].mascAcep(
+						acceptedMasks[listaIndex][accepted[listaIndex][j]
+								.getId()], enCurso_x) == false) {
 					seAcepta = true; // Contribuye
 					// Si es super-reducto
-					if (acceptedMasks[listaIndex + 1][proxUltimo+1].esUnitario()) {
-						
+					if (acceptedMasks[listaIndex + 1][enCurso_x.getId()]
+							.esUnitario()) {
+
 						filaSel[++listaIndex] = enCurso_x;
 						top = 0;
 						tempSol[top] = countRepated[listaIndex][top];
 
-
-						Solution solucion = new Solution(listaIndex + 1); // No. de rasgos del
-														// TT. (cabecera)
+						Solution solucion = new Solution(listaIndex + 1); // No.
+																			// de
+																			// rasgos
+																			// del
+						// TT. (cabecera)
 						while (top >= 0) { // - Extarer los TT de los
 											// pseudoTT.
 							if (tempSol[top] == 0)
