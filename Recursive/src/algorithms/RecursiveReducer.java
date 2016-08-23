@@ -7,21 +7,27 @@ import tools.TPila;
 import tools.TuplaBinaria;
 
 public class RecursiveReducer {
+	// public enum verbose {QUIET,REDUCTS,REPEATED,CANDIDATES}
 	private static final int DERECHA = 2;
 	private static final int IZQUIERDA = 1;
-	private static final boolean DEBUG = true;
+	private static final boolean CANDIDATES = false;
+	private static final boolean REPEATED = false;
+	private static final boolean REDUCTS = false;
 
 	public long contadorComprobaciones = 0;
 
 	private int numColumnas, numFilas; // -
 	int contadorTestores;
-																		// Numero
-																		// de
+	// Numero
+	// de
 	// soluciones.
 	int contadorTTs;
 
 	private TuplaBinaria[] rasgo; // - Lista de rasgos de la matriz
-	private LinkedList<Solution> soluciones; // - Lista de TT.
+	private LinkedList<Solution> soluciones = new LinkedList<Solution>(); // -
+																			// Lista
+																			// de
+																			// TT.
 
 	// --------------------------------------------------------------------------
 	public RecursiveReducer() {
@@ -368,7 +374,7 @@ public class RecursiveReducer {
 			}
 		}
 		countRepeated = new int[numColumnas][numColumnas];
-		
+
 		// ************** Reducir el numero de columnas **************
 		reducirColumnas(countRepeated[0], repeated[0], accepted[0]);
 		// - Inicializar las máscaras de nivel 0 con los rasgos iniciales
@@ -397,6 +403,10 @@ public class RecursiveReducer {
 					break; // SALIR
 				}
 				contadorComprobaciones++;
+				if (CANDIDATES)
+					System.out.println("x"
+							+ Integer.toString(rasgo_X.getId() + 1));
+
 				if (rasgo_X.cantValoresUnitarios() == numFilas) {
 					// - Registrar un solo rasgo.
 					Solution solucion = new Solution(1);
@@ -409,19 +419,20 @@ public class RecursiveReducer {
 				}
 			}
 			filaSel[listaIndex] = rasgo_X;
-
 			// Verificar la contribución
 			proxUltimo = -1;
 			for (j = primero + 1; j <= ultimo; j++) { // Para cada rasgo
 														// aceptado
 				enCurso_x = accepted[listaIndex][j]; // Rasgo actual
 				contadorComprobaciones++;
+				if (CANDIDATES)
+					printCurrentCandidate(filaSel, listaIndex, enCurso_x);
 
 				isTypical = false;
 				seAcepta = false;
 				if (acceptedMasks[listaIndex + 1][enCurso_x.getId()].mascAcep(
-						acceptedMasks[listaIndex][filaSel[listaIndex]
-								.getId()], enCurso_x) == false) {
+						acceptedMasks[listaIndex][filaSel[listaIndex].getId()],
+						enCurso_x) == false) {
 					seAcepta = true; // Contribuye
 					// Si es super-reducto
 					if (acceptedMasks[listaIndex + 1][enCurso_x.getId()]
@@ -430,73 +441,114 @@ public class RecursiveReducer {
 
 						filaSel[++listaIndex] = enCurso_x;
 						top = 0;
-						tempSol[top] = countRepeated[listaIndex][top] + 1;
+						tempSol[top] = countRepeated[top][filaSel[top].getId()] + 1;
+
+						Solution solucion = new Solution(listaIndex + 1);
 
 						while (top >= 0) { // - Extarer los TT de los
 											// pseudoTT.
-							Solution solucion = new Solution(listaIndex + 1);
-							
+
 							if (tempSol[top] == 0) {
 								top--;
 							} else {
 								if (tempSol[top] == 1) {
 									solucion.setAttribute(top, filaSel[top]);
 								} else {
-									solucion.setAttribute(top,
-											repeated[listaIndex][filaSel[top]
-													.getId()][tempSol[top] - 2]);
+									if (top == listaIndex) {// Last attribute in
+															// the candidate
+										solucion.setAttribute(
+												top,
+												repeated[top - 1][filaSel[top]
+														.getId()][tempSol[top] - 2]); // Use
+																						// the
+																						// last
+										// list of
+										// repated
+									} else {
+										solucion.setAttribute(
+												top,
+												repeated[top][filaSel[top]
+														.getId()][tempSol[top] - 2]);
+									}
 								}
 								tempSol[top]--;
 								if (top < listaIndex) {
 									top++;
-									tempSol[top] = countRepeated[listaIndex][top] + 1;
+									if (top == listaIndex) {// Last attribute in
+															// the candidate
+										tempSol[top] = countRepeated[top - 1][filaSel[top]
+												.getId()] + 1; // Use the last
+																// list of
+																// repated
+									} else {
+										tempSol[top] = countRepeated[top][filaSel[top]
+												.getId()] + 1;
+									}
 
 								} else {
 									contadorTestores++;
 									if (typical(solucion)) {
 										isTypical = true;
 										lastTT = solucion;
-										soluciones.add(solucion);
+										soluciones.add(new Solution(solucion));
 										contadorTTs++;
 
-										if (DEBUG) 
+										if (REDUCTS) {
 											// Print the solution
-											System.out.println(solucion);
-											
-
+											System.out.print(solucion);
+											System.out.println("TT");
 										}
 									}
-
 								}
+
 							}
 						}
 						listaIndex--;
-						// }
-						// ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-						// - como l + [enCurso_x] forman un TT entonces
-						seAcepta = false; // - enCurso_x no se agrega a la
-											// prox lista.
-						isTypical = true;
 					}
+
+				}
 
 				// *********************************************************
 				// - Si enCurso_x es no excluyente con l y no forma un TT con el
 				// mismo.
 				if (seAcepta) {
-					// - Agrego enCurso_x a los aceptados del proximo nivel de recursividad
-					//   si no está repetida su máscara de aceptación.
+					// - Agrego enCurso_x a los aceptados del proximo nivel de
+					// recursividad
+					// si no está repetida su máscara de aceptación.
+					// TODO acá hay q dejar de verificar cuando se acerque el
+					// final
 					boolean isRepated = false;
-					for(i=0;i<=proxUltimo;i++){
-						if(acceptedMasks[listaIndex + 1][accepted[listaIndex + 1][i].getId()].igualA(enCurso_x)){
-							// Está repetido en los proximos niveles de recursividad
-							repeated[listaIndex + 1][accepted[listaIndex + 1][i].getId()][countRepeated[listaIndex + 1][accepted[listaIndex + 1][i].getId()]++]=enCurso_x;
+					for (int u = 0; u <= proxUltimo; u++) {
+						// Current acepted attribute' ID
+						int aceptado = accepted[listaIndex + 1][u].getId();
+
+						if (acceptedMasks[listaIndex + 1][aceptado]
+								.igualA(acceptedMasks[listaIndex + 1][enCurso_x
+										.getId()])) {
+							// Está repetido en los proximos niveles de
+							// recursividad
+							for (int k = 0; k < countRepeated[listaIndex][enCurso_x
+									.getId()]; k++) {
+								repeated[listaIndex + 1][aceptado][countRepeated[listaIndex + 1][aceptado]++] = repeated[listaIndex][enCurso_x
+										.getId()][k];
+							}
+							repeated[listaIndex + 1][aceptado][countRepeated[listaIndex + 1][aceptado]++] = enCurso_x;
 							isRepated = true;
 							break;
 						}
 					}
-					if (!isRepated)
+					if (!isRepated) {
 						accepted[listaIndex + 1][++proxUltimo] = enCurso_x;
-
+						// Pass repeated elements of this attribute
+						// To the next recurssion level
+						countRepeated[listaIndex + 1][enCurso_x.getId()] = countRepeated[listaIndex][enCurso_x
+								.getId()];
+						for (int k = 0; k < countRepeated[listaIndex][enCurso_x
+								.getId()]; k++) {
+							repeated[listaIndex + 1][enCurso_x.getId()][k] = repeated[listaIndex][enCurso_x
+									.getId()][k];
+						}
+					}
 
 				}
 			}// for
@@ -517,37 +569,33 @@ public class RecursiveReducer {
 				primero = 0; // - Se actualiza los rangos de la proxima lista.
 				ultimo = proxUltimo;
 
-				if (DEBUG) {
+				if (REPEATED) {
 					// === Imprimir la base del candidato ===
 					System.out.print("Base: ");
-					for (int d = 0; d < listaIndex; d++) {
-						System.out
-								.print("x"
-										+ Integer.toString(filaSel[d]
-												.getId() + 1));
+					for (i = 0; i < listaIndex; i++) {
+						System.out.print("x"
+								+ Integer.toString(filaSel[i].getId() + 1));
 					}
-					System.out.println();
+					System.out.println(" ListaIndex = " + listaIndex);
 				}
-						// ======= Imprimir Lista de contraidos ===========
-						if (DEBUG) {
-							System.out.println();
-							for (i = primero; i <= ultimo; i++) {
-								System.out
-										.print("Att x"
-												+ Integer
-														.toString(accepted[listaIndex][i].getId() + 1)
-												+ ": ");
-								for (j = 0; j < countRepeated[listaIndex][accepted[listaIndex][i].getId()]; j++) {
-									System.out
-											.print("x"
-													+ Integer
-															.toString(repeated[listaIndex][accepted[listaIndex][i].getId()][j].getId() + 1));
-								}
-								System.out.println();
-							}
+				// ======= Imprimir Lista de contraidos ===========
+				if (REPEATED) {
+					for (i = primero; i <= ultimo; i++) {
+						System.out.print("Att x"
+								+ Integer.toString(accepted[listaIndex][i]
+										.getId() + 1) + ": ");
+						for (j = 0; j < countRepeated[listaIndex][accepted[listaIndex][i]
+								.getId()]; j++) {
+							System.out
+									.print("x"
+											+ Integer
+													.toString(repeated[listaIndex][accepted[listaIndex][i]
+															.getId()][j]
+															.getId() + 1));
 						}
-					
-				
+						System.out.println();
+					}
+				}
 
 				// ====================================================================
 
@@ -576,6 +624,10 @@ public class RecursiveReducer {
 				// - Indexo y extraigo intervalo, de la lista.
 			primero = pilaPrimero.pop(); // - No ser�a de la anterior sin�...
 			ultimo = pilaUltimo.pop(); // la que toque segun listaIndex ::::
+			// // Clean up repeated
+			// for (int u = listaIndex; u < numColumnas; u++){
+			// countRepeated[listaIndex-1][u] = 0;
+			// }
 			listaIndex--;
 			continue; // //break paso_3;
 		} // while(true)
@@ -587,6 +639,17 @@ public class RecursiveReducer {
 		 * for (i=0; i<numColumnas; i++) { frecAmplitud[i] /= frecAparicion[i];
 		 * frecAparicion[i] /= contadorTestores; }
 		 */
+	}
+
+	// ***********************************************************************
+	// Print the current candidate for debugging purposes
+	// ************************************************** ********************
+	private void printCurrentCandidate(TuplaBinaria[] filasel, int listaindex,
+			TuplaBinaria enCurso) {
+		for (int i = 0; i <= listaindex; i++) {
+			System.out.print("x" + Integer.toString(filasel[i].getId() + 1));
+		}
+		System.out.println("x" + Integer.toString(enCurso.getId() + 1));
 	}
 
 	// ******************************************************************

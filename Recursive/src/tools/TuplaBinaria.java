@@ -441,9 +441,9 @@ public class TuplaBinaria {
 		// - Imprimir una tupla
 		// ***************************************************************************
 		public String toString() {
-			String str_tuple= "";
+			String str_tuple= "x"+Integer.toString(idTupla+1)+": ";
 			for (int i = 0; i < numUnidades; i++){
-				str_tuple += unidad[i]+",";
+				str_tuple += String.format("%32s", Integer.toBinaryString(unidad[i])).replace(' ', '0');
 			}
 			return str_tuple;
 		}

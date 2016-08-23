@@ -7,6 +7,13 @@ public class Solution {
 		this.length = length;
 		attsArray = new TuplaBinaria[length];
 	}
+	public Solution(Solution solucion) {
+		this.length = solucion.length;
+		attsArray = new TuplaBinaria[length];
+		for (int i = 0; i< length; i++){
+			attsArray[i] = solucion.attsArray[i];
+		}
+	}
 	public String toString() {
 		String tt = "";
 		for(int i = 0; i< length; i++)
