@@ -10,9 +10,12 @@ public class RecursiveReducer {
 	// public enum verbose {QUIET,REDUCTS,REPEATED,CANDIDATES}
 	private static final int DERECHA = 2;
 	private static final int IZQUIERDA = 1;
+	// DEBUG loggin flags
 	private static final boolean CANDIDATES = false;
 	private static final boolean REPEATED = false;
 	private static final boolean REDUCTS = false;
+	// Stop the search for repeated
+	private int STOPrepeats = 2;
 
 	public long contadorComprobaciones = 0;
 
@@ -38,7 +41,17 @@ public class RecursiveReducer {
 		// int a = 1, cont = 0; while (a != 0) { a <<= 1; cont++; }
 		// TuplaBinaria.zizeOfUnidad = cont;
 	}
-
+	
+	// --------------------------------------------------------------------------
+		public RecursiveReducer(int stop) {
+			super();
+			numFilas = 0;
+			numColumnas = 0;
+			STOPrepeats = stop;
+			// - Determinar el # de bit que ocupa un int.
+			// int a = 1, cont = 0; while (a != 0) { a <<= 1; cont++; }
+			// TuplaBinaria.zizeOfUnidad = cont;
+		}
 	// ---------------------------------------------------------------------------
 	public void set(int filas, int columnas) {
 		numFilas = filas;
@@ -490,7 +503,8 @@ public class RecursiveReducer {
 									if (typical(solucion)) {
 										isTypical = true;
 										lastTT = solucion;
-										soluciones.add(new Solution(solucion));
+										// soluciones.add(new
+										// Solution(solucion));
 										contadorTTs++;
 
 										if (REDUCTS) {
@@ -518,23 +532,25 @@ public class RecursiveReducer {
 					// TODO acá hay q dejar de verificar cuando se acerque el
 					// final
 					boolean isRepated = false;
-					for (int u = 0; u <= proxUltimo; u++) {
-						// Current acepted attribute' ID
-						int aceptado = accepted[listaIndex + 1][u].getId();
+					if (primero + STOPrepeats < ultimo) {
+						for (int u = 0; u <= proxUltimo; u++) {
+							// Current acepted attribute' ID
+							int aceptado = accepted[listaIndex + 1][u].getId();
 
-						if (acceptedMasks[listaIndex + 1][aceptado]
-								.igualA(acceptedMasks[listaIndex + 1][enCurso_x
-										.getId()])) {
-							// Está repetido en los proximos niveles de
-							// recursividad
-							for (int k = 0; k < countRepeated[listaIndex][enCurso_x
-									.getId()]; k++) {
-								repeated[listaIndex + 1][aceptado][countRepeated[listaIndex + 1][aceptado]++] = repeated[listaIndex][enCurso_x
-										.getId()][k];
+							if (acceptedMasks[listaIndex + 1][aceptado]
+									.igualA(acceptedMasks[listaIndex + 1][enCurso_x
+											.getId()])) {
+								// Está repetido en los proximos niveles de
+								// recursividad
+								for (int k = 0; k < countRepeated[listaIndex][enCurso_x
+										.getId()]; k++) {
+									repeated[listaIndex + 1][aceptado][countRepeated[listaIndex + 1][aceptado]++] = repeated[listaIndex][enCurso_x
+											.getId()][k];
+								}
+								repeated[listaIndex + 1][aceptado][countRepeated[listaIndex + 1][aceptado]++] = enCurso_x;
+								isRepated = true;
+								break;
 							}
-							repeated[listaIndex + 1][aceptado][countRepeated[listaIndex + 1][aceptado]++] = enCurso_x;
-							isRepated = true;
-							break;
 						}
 					}
 					if (!isRepated) {
@@ -602,11 +618,11 @@ public class RecursiveReducer {
 				// -> Ir al paso 3
 				continue; // break paso_3;
 				// TODO revisar lo q pasa con el gap
-				// } else if (seAcepta == true || esTestor) { // - Eliminar el
+			} else if (seAcepta || isTypical) { // - Eliminar el
 				// hueco.
-			} else if (false) { // - Eliminar el hueco.
-								// tl = elimK(tl,
-								// hueco(l', tl))
+				// } else if (false) { // - Eliminar el hueco.
+				// tl = elimK(tl,
+				// hueco(l', tl))
 				hueco = listaIndex - 1;
 				while (true) {
 					if (hueco <= 0)
